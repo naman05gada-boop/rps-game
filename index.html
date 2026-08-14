@@ -1,41 +1,407 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Guess the Number</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Guess the Number</title>
+
     <link rel="stylesheet" href="style.css">
-    
 </head>
 
 <body>
 
-
     <div class="game">
-        <h1>🎯 Guess the Number</h1>
-        <p>I'm thinking of a number from 1 to 10!</p>
-        <input type="number" id="guess" placeholder="Enter your guess">
-        <button onclick="checkGuess()">GUESS</button>
-        <p id="result"></p>
+
+        <!-- TITLE -->
+        <h1>🎮 Guess the Number</h1>
+
+        <p class="subtitle">
+            Choose your difficulty and test your luck!
+        </p>
+
+
+        <!-- DIFFICULTY -->
+        <div class="difficulty-section">
+
+            <h2>Choose Difficulty</h2>
+
+            <div class="difficulty-buttons">
+
+                <button class="difficulty easy" onclick="startGame(10)">
+                    🟢 Easy
+                    <span>1–10</span>
+                </button>
+
+                <button class="difficulty medium" onclick="startGame(50)">
+                    🟡 Medium
+                    <span>1–50</span>
+                </button>
+
+                <button class="difficulty hard" onclick="startGame(100)">
+                    🔴 Hard
+                    <span>1–100</span>
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- GAME INFORMATION -->
+        <div class="stats">
+
+            <div class="stat">
+                ❤️ Lives
+                <strong id="lives">5</strong>
+            </div>
+
+            <div class="stat">
+                🔢 Attempts
+                <strong id="attempts">0</strong>
+            </div>
+
+            <div class="stat">
+                🏆 Best
+                <strong id="bestScore">---</strong>
+            </div>
+
+        </div>
+
+
+        <!-- GAME AREA -->
+        <div class="game-area">
+
+            <p id="gameMessage">
+                Choose a difficulty to begin!
+            </p>
+
+            <div class="guess-area">
+
+                <input
+                    type="number"
+                    id="guess"
+                    placeholder="Your guess"
+                    disabled
+                >
+
+                <button
+                    id="guessButton"
+                    onclick="checkGuess()"
+                    disabled
+                >
+                    GUESS
+                </button>
+
+            </div>
+
+            <p id="result"></p>
+
+        </div>
+
+
+        <!-- NEW GAME -->
+        <button
+            class="new-game"
+            onclick="resetGame()"
+        >
+            🔄 New Game
+        </button>
+
     </div>
 
+
     <script>
-        let secretNumber = Math.floor(Math.random() * 10) + 1;
 
-        function checkGuess() {
-            let guess = Number(document.getElementById("guess").value);
+        // =========================
+        // GAME VARIABLES
+        // =========================
 
-            if (guess === secretNumber) {
-                document.getElementById("result").textContent = "🎉 Correct!";
-            } 
-            else if (guess < secretNumber) {
-                document.getElementById("result").textContent = "⬆️ Too low!";
-            } 
-            else {
-                document.getElementById("result").textContent = "⬇️ Too high!";
+        let secretNumber = 0;
+        let maximum = 10;
+
+        let attempts = 0;
+        let lives = 5;
+
+        let bestScore = null;
+
+        let gameActive = false;
+
+
+        // =========================
+        // START GAME
+        // =========================
+
+        function startGame(maxNumber) {
+
+            maximum = maxNumber;
+
+            secretNumber = Math.floor(
+                Math.random() * maximum
+            ) + 1;
+
+            attempts = 0;
+            lives = 5;
+
+            gameActive = true;
+
+
+            // Reset display
+
+            document.getElementById("attempts").textContent = attempts;
+
+            document.getElementById("lives").textContent = lives;
+
+            document.getElementById("result").textContent = "";
+
+            document.getElementById("gameMessage").textContent =
+                `I'm thinking of a number from 1 to ${maximum}!`;
+
+
+            // Enable game controls
+
+            document.getElementById("guess").disabled = false;
+
+            document.getElementById("guessButton").disabled = false;
+
+            document.getElementById("guess").value = "";
+
+            document.getElementById("guess").focus();
+
+
+            // Update best score display
+
+            if (bestScore === null) {
+
+                document.getElementById("bestScore").textContent = "---";
+
+            } else {
+
+                document.getElementById("bestScore").textContent =
+                    bestScore;
+
             }
         }
+
+
+        // =========================
+        // CHECK GUESS
+        // =========================
+
+        function checkGuess() {
+
+            if (!gameActive) {
+                return;
+            }
+
+
+            const guessInput =
+                document.getElementById("guess");
+
+            const result =
+                document.getElementById("result");
+
+            const guess =
+                Number(guessInput.value);
+
+
+            // Check valid number
+
+            if (
+                guess < 1 ||
+                guess > maximum ||
+                !guess
+            ) {
+
+                result.textContent =
+                    `⚠️ Enter a number from 1 to ${maximum}!`;
+
+                return;
+            }
+
+
+            // Count attempt
+
+            attempts++;
+
+            document.getElementById("attempts").textContent =
+                attempts;
+
+
+            // CORRECT
+
+            if (guess === secretNumber) {
+
+                result.textContent =
+                    "🎉 CORRECT!";
+
+                result.classList.remove(
+                    "correct-animation"
+                );
+
+                void result.offsetWidth;
+
+                result.classList.add(
+                    "correct-animation"
+                );
+
+
+                // Check high score
+
+                if (
+                    bestScore === null ||
+                    attempts < bestScore
+                ) {
+
+                    bestScore = attempts;
+
+                    document.getElementById("bestScore")
+                        .textContent = bestScore;
+
+                    document.getElementById("gameMessage")
+                        .textContent =
+                        "🏆 NEW HIGH SCORE!";
+                }
+
+                else {
+
+                    document.getElementById("gameMessage")
+                        .textContent =
+                        "🎉 You got it!";
+                }
+
+
+                // End round
+
+                gameActive = false;
+
+                disableGame();
+
+                return;
+            }
+
+
+            // WRONG GUESS
+
+            if (guess < secretNumber) {
+
+                result.textContent =
+                    "📉 Too low!";
+
+            } else {
+
+                result.textContent =
+                    "📈 Too high!";
+            }
+
+
+            // Remove a life
+
+            lives--;
+
+            document.getElementById("lives").textContent =
+                lives;
+
+
+            // GAME OVER
+
+            if (lives <= 0) {
+
+                result.textContent =
+                    "💀 GAME OVER!";
+
+                document.getElementById("gameMessage")
+                    .textContent =
+                    `The number was ${secretNumber}.`;
+
+                gameActive = false;
+
+                disableGame();
+
+                return;
+            }
+
+
+            // Clear input
+
+            guessInput.value = "";
+
+            guessInput.focus();
+        }
+
+
+        // =========================
+        // DISABLE GAME
+        // =========================
+
+        function disableGame() {
+
+            document.getElementById("guess").disabled = true;
+
+            document.getElementById("guessButton").disabled = true;
+        }
+
+
+        // =========================
+        // NEW GAME
+        // =========================
+
+        function resetGame() {
+
+            maximum = 10;
+
+            secretNumber = 0;
+
+            attempts = 0;
+
+            lives = 5;
+
+            gameActive = false;
+
+
+            document.getElementById("attempts")
+                .textContent = "0";
+
+            document.getElementById("lives")
+                .textContent = "5";
+
+            document.getElementById("result")
+                .textContent = "";
+
+            document.getElementById("gameMessage")
+                .textContent =
+                "Choose a difficulty to begin!";
+
+
+            document.getElementById("guess")
+                .value = "";
+
+            document.getElementById("guess")
+                .disabled = true;
+
+            document.getElementById("guessButton")
+                .disabled = true;
+        }
+
+
+        // =========================
+        // ENTER KEY SUPPORT
+        // =========================
+
+        document.getElementById("guess")
+            .addEventListener("keydown", function(event) {
+
+                if (event.key === "Enter") {
+
+                    checkGuess();
+
+                }
+
+            });
+
     </script>
 
-
 </body>
+
 </html>
