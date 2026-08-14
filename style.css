@@ -1,53 +1,579 @@
-body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background: #111827;
-    color: white;
-    padding-top: 40px;
-    padding-left: 15px;
-    padding-right: 15px;
-}
+/* =========================
+   BASIC PAGE
+========================= */
 
-.game {
-    background: #1f2937;
-    max-width: 350px;
-    width: 100%;
-    margin: auto;
-    padding: 35px;
-    border-radius: 20px;
+* {
     box-sizing: border-box;
 }
 
-h1 {
-    font-size: 34px;
+body {
+
+    font-family: Arial, sans-serif;
+
+    text-align: center;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #243b55,
+            #111827 60%
+        );
+
+    color: white;
+
+    margin: 0;
+
+    min-height: 100vh;
+
+    padding: 40px 15px;
+
 }
 
-p {
-    font-size: 18px;
+
+/* =========================
+   MAIN GAME CARD
+========================= */
+
+.game {
+
+    background: rgba(31, 41, 55, 0.96);
+
+    max-width: 650px;
+
+    width: 100%;
+
+    margin: auto;
+
+    padding: 45px;
+
+    border-radius: 28px;
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.45);
+
 }
+
+
+/* =========================
+   TITLE
+========================= */
+
+h1 {
+
+    font-size: clamp(36px, 7vw, 56px);
+
+    font-weight: 800;
+
+    margin:
+        0
+        0
+        10px;
+
+    letter-spacing: 1px;
+
+}
+
+
+.subtitle {
+
+    font-size: 19px;
+
+    color: #d1d5db;
+
+    margin-bottom: 30px;
+
+}
+
+
+/* =========================
+   DIFFICULTY
+========================= */
+
+.difficulty-section h2 {
+
+    font-size: 24px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.difficulty-buttons {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+
+}
+
+
+.difficulty {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 4px;
+
+    min-width: 130px;
+
+    margin: 0;
+
+}
+
+
+.difficulty span {
+
+    font-size: 14px;
+
+    opacity: 0.8;
+
+}
+
+
+.easy {
+
+    background: #16a34a;
+
+}
+
+
+.easy:hover {
+
+    background: #15803d;
+
+}
+
+
+.medium {
+
+    background: #ca8a04;
+
+}
+
+
+.medium:hover {
+
+    background: #a16207;
+
+}
+
+
+.hard {
+
+    background: #dc2626;
+
+}
+
+
+.hard:hover {
+
+    background: #b91c1c;
+
+}
+
+
+/* =========================
+   STATS
+========================= */
+
+.stats {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 18px;
+
+    margin: 30px 0;
+
+    flex-wrap: wrap;
+
+}
+
+
+.stat {
+
+    background: #111827;
+
+    padding: 15px 20px;
+
+    border-radius: 14px;
+
+    min-width: 140px;
+
+    font-size: 16px;
+
+}
+
+
+.stat strong {
+
+    display: block;
+
+    font-size: 25px;
+
+    margin-top: 5px;
+
+}
+
+
+/* =========================
+   GAME AREA
+========================= */
+
+.game-area {
+
+    margin-top: 10px;
+
+}
+
+
+#gameMessage {
+
+    font-size: 19px;
+
+    min-height: 29px;
+
+}
+
+
+.guess-area {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+}
+
+
+/* =========================
+   INPUT
+========================= */
 
 input {
+
     padding: 14px;
-    width: 120px;
+
+    width: 160px;
+
     font-size: 20px;
+
     text-align: center;
-    border-radius: 8px;
-    border: none;
+
+    border-radius: 10px;
+
+    border: 2px solid transparent;
+
+    outline: none;
+
+    transition:
+        transform 0.2s ease,
+        border 0.2s ease;
+
 }
+
+
+input:focus {
+
+    border-color: #3b82f6;
+
+    transform: scale(1.04);
+
+}
+
+
+input:disabled {
+
+    opacity: 0.5;
+
+    cursor: not-allowed;
+
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
 
 button {
+
     padding: 14px 24px;
-    margin-left: 8px;
+
     margin-top: 10px;
-    font-size: 20px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
     cursor: pointer;
-    border-radius: 8px;
+
+    border-radius: 10px;
+
     border: none;
+
     background: #3b82f6;
+
     color: white;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+
 }
 
-#result {
-    font-size: 24px;
+
+button:hover:not(:disabled) {
+
+    transform:
+        translateY(-3px)
+        scale(1.04);
+
+    box-shadow:
+        0 8px 20px rgba(
+            0,
+            0,
+            0,
+            0.25
+        );
+
+}
+
+
+button:active:not(:disabled) {
+
+    transform: scale(0.95);
+
+}
+
+
+button:disabled {
+
+    opacity: 0.45;
+
+    cursor: not-allowed;
+
+}
+
+
+/* =========================
+   NEW GAME
+========================= */
+
+.new-game {
+
     margin-top: 25px;
+
+    background: #10b981;
+
+}
+
+
+.new-game:hover {
+
+    background: #059669;
+
+}
+
+
+/* =========================
+   RESULT
+========================= */
+
+#result {
+
+    font-size: 26px;
+
+    font-weight: bold;
+
+    min-height: 38px;
+
+    margin-top: 25px;
+
+}
+
+
+/* =========================
+   WIN ANIMATION
+========================= */
+
+@keyframes celebrate {
+
+    0% {
+
+        transform:
+            scale(1);
+
+    }
+
+    30% {
+
+        transform:
+            scale(1.25)
+            rotate(-3deg);
+
+    }
+
+    60% {
+
+        transform:
+            scale(1.12)
+            rotate(3deg);
+
+    }
+
+    100% {
+
+        transform:
+            scale(1);
+
+    }
+
+}
+
+
+.correct-animation {
+
+    animation:
+        celebrate
+        0.7s
+        ease;
+
+}
+
+
+/* =========================
+   PHONE RESPONSIVE DESIGN
+========================= */
+
+@media (max-width: 599px) {
+
+    body {
+
+        padding:
+            20px
+            10px;
+
+    }
+
+
+    .game {
+
+        padding:
+            28px
+            18px;
+
+        border-radius:
+            22px;
+
+    }
+
+
+    h1 {
+
+        font-size:
+            clamp(
+                32px,
+                9vw,
+                44px
+            );
+
+    }
+
+
+    .subtitle {
+
+        font-size: 16px;
+
+    }
+
+
+    .difficulty-buttons {
+
+        flex-direction: column;
+
+        align-items: center;
+
+    }
+
+
+    .difficulty {
+
+        width: 90%;
+
+        max-width: 280px;
+
+    }
+
+
+    .stats {
+
+        gap: 10px;
+
+    }
+
+
+    .stat {
+
+        min-width: 100px;
+
+        padding:
+            12px;
+
+        font-size: 14px;
+
+    }
+
+
+    .stat strong {
+
+        font-size: 21px;
+
+    }
+
+
+    .guess-area {
+
+        flex-direction: column;
+
+    }
+
+
+    input {
+
+        width: 140px;
+
+    }
+
+
+    button {
+
+        font-size: 17px;
+
+        padding:
+            13px
+            20px;
+
+    }
+
+
+    #result {
+
+        font-size: 22px;
+
+    }
+
 }
