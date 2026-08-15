@@ -12,393 +12,2641 @@
 
 <body>
 
-    <div class="game">
+    <!-- =====================================================
+         BACKGROUND ATMOSPHERE
+    ====================================================== -->
 
-        <!-- TITLE -->
-        <h1>🎮 Guess the Number</h1>
-
-        <p class="subtitle">
-            Choose your difficulty and test your luck!
-        </p>
-
-
-        <!-- DIFFICULTY -->
-        <div class="difficulty-section">
-
-            <h2>Choose Difficulty</h2>
-
-            <div class="difficulty-buttons">
-
-                <button class="difficulty easy" onclick="startGame(10)">
-                    🟢 Easy
-                    <span>1–10</span>
-                </button>
-
-                <button class="difficulty medium" onclick="startGame(50)">
-                    🟡 Medium
-                    <span>1–50</span>
-                </button>
-
-                <button class="difficulty hard" onclick="startGame(100)">
-                    🔴 Hard
-                    <span>1–100</span>
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <!-- GAME INFORMATION -->
-        <div class="stats">
-
-            <div class="stat">
-                ❤️ Lives
-                <strong id="lives">5</strong>
-            </div>
-
-            <div class="stat">
-                🔢 Attempts
-                <strong id="attempts">0</strong>
-            </div>
-
-            <div class="stat">
-                🏆 Best
-                <strong id="bestScore">---</strong>
-            </div>
-
-        </div>
-
-
-        <!-- GAME AREA -->
-        <div class="game-area">
-
-            <p id="gameMessage">
-                Choose a difficulty to begin!
-            </p>
-
-            <div class="guess-area">
-
-                <input
-                    type="number"
-                    id="guess"
-                    placeholder="Your guess"
-                    disabled
-                >
-
-                <button
-                    id="guessButton"
-                    onclick="checkGuess()"
-                    disabled
-                >
-                    GUESS
-                </button>
-
-            </div>
-
-            <p id="result"></p>
-
-        </div>
-
-
-        <!-- NEW GAME -->
-        <button
-            class="new-game"
-            onclick="resetGame()"
-        >
-            🔄 New Game
-        </button>
-
+    <div class="background-effects">
+        <div class="orb orb-one"></div>
+        <div class="orb orb-two"></div>
+        <div class="grid"></div>
     </div>
 
 
+    <!-- =====================================================
+         MAIN APP
+    ====================================================== -->
+
+    <main class="app">
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <header class="header">
+
+            <div class="brand">
+                <div class="brand-icon">🎮</div>
+
+                <div>
+                    <h1>Guess the Number</h1>
+                    <p>Outsmart the number. Build your streak. Become the legend.</p>
+                </div>
+            </div>
+
+
+            <!-- PLAYER HUD -->
+
+            <div class="hud">
+
+                <div class="hud-item coins">
+                    <span>🪙</span>
+                    <div>
+                        <small>Coins</small>
+                        <strong id="coins">0</strong>
+                    </div>
+                </div>
+
+                <div class="hud-item xp">
+                    <span>⭐</span>
+                    <div>
+                        <small>XP</small>
+                        <strong id="xp">0</strong>
+                    </div>
+                </div>
+
+                <div class="hud-item level">
+                    <span>⚡</span>
+                    <div>
+                        <small>Level</small>
+                        <strong id="playerLevel">1</strong>
+                    </div>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             NAVIGATION
+        ================================================== -->
+
+        <nav class="navigation">
+
+            <button
+                class="nav-button active"
+                data-screen="gameScreen"
+                onclick="showScreen('gameScreen')"
+            >
+                🎮 Game
+            </button>
+
+            <button
+                class="nav-button"
+                data-screen="shopScreen"
+                onclick="showScreen('shopScreen')"
+            >
+                🛒 Shop
+            </button>
+
+            <button
+                class="nav-button"
+                data-screen="profileScreen"
+                onclick="showScreen('profileScreen')"
+            >
+                🏆 Profile
+            </button>
+
+        </nav>
+
+
+        <!-- =================================================
+             SCREENS
+        ================================================== -->
+
+        <section class="screens">
+
+
+            <!-- =================================================
+                 GAME SCREEN
+            ================================================== -->
+
+            <section
+                id="gameScreen"
+                class="screen active-screen"
+            >
+
+                <!-- LEVEL SELECTOR -->
+
+                <div class="panel level-panel">
+
+                    <div class="panel-heading">
+
+                        <div>
+                            <span class="eyebrow">PROGRESSION</span>
+                            <h2>Choose Your Level</h2>
+                        </div>
+
+                        <span class="level-counter" id="levelCounter">
+                            1 / 8
+                        </span>
+
+                    </div>
+
+
+                    <div class="level-grid">
+
+                        <button
+                            class="level-button selected"
+                            data-level="1"
+                            onclick="selectLevel(1)"
+                        >
+                            <span class="level-icon">⚡</span>
+                            <strong>Level 1</strong>
+                            <small>1 – 10</small>
+                            <em>5 ❤️</em>
+                        </button>
+
+
+                        <button
+                            class="level-button locked"
+                            data-level="2"
+                            onclick="selectLevel(2)"
+                        >
+                            <span class="level-icon">🔒</span>
+                            <strong>Level 2</strong>
+                            <small>1 – 50</small>
+                            <em>6 ❤️</em>
+                        </button>
+
+
+                        <button
+                            class="level-button locked"
+                            data-level="3"
+                            onclick="selectLevel(3)"
+                        >
+                            <span class="level-icon">🔒</span>
+                            <strong>Level 3</strong>
+                            <small>1 – 100</small>
+                            <em>7 ❤️</em>
+                        </button>
+
+
+                        <button
+                            class="level-button locked"
+                            data-level="4"
+                            onclick="selectLevel(4)"
+                        >
+                            <span class="level-icon">🔒</span>
+                            <strong>Level 4</strong>
+                            <small>1 – 1,000</small>
+                            <em>8 ❤️</em>
+                        </button>
+
+
+                        <button
+                            class="level-button locked"
+                            data-level="5"
+                            onclick="selectLevel(5)"
+                        >
+                            <span class="level-icon">🔒</span>
+                            <strong>Level 5</strong>
+                            <small>1 – 10,000</small>
+                            <em>9 ❤️</em>
+                        </button>
+
+
+                        <button
+                            class="level-button locked"
+                            data-level="6"
+                            onclick="selectLevel(6)"
+                        >
+                            <span class="level-icon">🔒</span>
+                            <strong>Level 6</strong>
+                            <small>1 – 100,000</small>
+                            <em>10 ❤️</em>
+                        </button>
+
+
+                        <button
+                            class="level-button locked"
+                            data-level="7"
+                            onclick="selectLevel(7)"
+                        >
+                            <span class="level-icon">🔒</span>
+                            <strong>Level 7</strong>
+                            <small>1 – 500,000</small>
+                            <em>11 ❤️</em>
+                        </button>
+
+
+                        <button
+                            class="level-button locked"
+                            data-level="8"
+                            onclick="selectLevel(8)"
+                        >
+                            <span class="level-icon">🔒</span>
+                            <strong>Level 8</strong>
+                            <small>1 – 1,000,000</small>
+                            <em>12 ❤️</em>
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- GAME PANEL -->
+
+                <div class="panel game-panel">
+
+                    <div class="game-status">
+
+                        <div class="status-item">
+                            <span>❤️</span>
+                            <div>
+                                <small>Lives</small>
+                                <strong id="lives">5</strong>
+                            </div>
+                        </div>
+
+                        <div class="status-item">
+                            <span>🔢</span>
+                            <div>
+                                <small>Attempts</small>
+                                <strong id="attempts">0</strong>
+                            </div>
+                        </div>
+
+                        <div class="status-item">
+                            <span>🏆</span>
+                            <div>
+                                <small>Best</small>
+                                <strong id="bestScore">---</strong>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="game-content">
+
+                        <span class="eyebrow">CURRENT MISSION</span>
+
+                        <h2 id="gameTitle">
+                            Guess the Number
+                        </h2>
+
+                        <p id="gameMessage">
+                            Choose a level to begin!
+                        </p>
+
+
+                        <!-- GUESS AREA -->
+
+                        <div class="guess-area">
+
+                            <input
+                                type="number"
+                                id="guess"
+                                placeholder="Your guess"
+                                disabled
+                                autocomplete="off"
+                            >
+
+                            <button
+                                id="guessButton"
+                                class="primary-button"
+                                onclick="checkGuess()"
+                                disabled
+                            >
+                                GUESS
+                            </button>
+
+                        </div>
+
+
+                        <div
+                            id="result"
+                            class="result"
+                            aria-live="polite"
+                        ></div>
+
+
+                        <!-- RESTART -->
+
+                        <button
+                            id="restartButton"
+                            class="secondary-button"
+                            onclick="restartLevel()"
+                        >
+                            🔄 Restart Level
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 SHOP SCREEN
+            ================================================== -->
+
+            <section
+                id="shopScreen"
+                class="screen"
+            >
+
+                <div class="panel shop-panel">
+
+                    <div class="screen-heading">
+
+                        <span class="eyebrow">UPGRADES</span>
+
+                        <h2>🛒 The Shop</h2>
+
+                        <p>
+                            Spend your coins on special abilities.
+                        </p>
+
+                    </div>
+
+
+                    <div class="shop-balance">
+                        🪙 <strong id="shopCoins">0</strong> coins
+                    </div>
+
+
+                    <div class="shop-grid">
+
+
+                        <!-- DOUBLE COINS -->
+
+                        <article class="shop-item">
+
+                            <div class="shop-icon">💰</div>
+
+                            <div class="shop-info">
+
+                                <h3>Coin Boost</h3>
+
+                                <p>
+                                    Earn extra coins when you win.
+                                </p>
+
+                                <span class="item-status" id="coinBoostStatus">
+                                    Locked
+                                </span>
+
+                            </div>
+
+                            <button
+                                class="shop-buy"
+                                id="coinBoostButton"
+                                onclick="buyItem('coinBoost')"
+                            >
+                                🪙 100
+                            </button>
+
+                        </article>
+
+
+                        <!-- EXTRA LIFE -->
+
+                        <article class="shop-item">
+
+                            <div class="shop-icon">❤️</div>
+
+                            <div class="shop-info">
+
+                                <h3>Extra Life</h3>
+
+                                <p>
+                                    Start levels with one additional life.
+                                </p>
+
+                                <span class="item-status" id="extraLifeStatus">
+                                    Locked
+                                </span>
+
+                            </div>
+
+                            <button
+                                class="shop-buy"
+                                id="extraLifeButton"
+                                onclick="buyItem('extraLife')"
+                            >
+                                🪙 150
+                            </button>
+
+                        </article>
+
+
+                        <!-- LUCKY NUMBER -->
+
+                        <article class="shop-item">
+
+                            <div class="shop-icon">🍀</div>
+
+                            <div class="shop-info">
+
+                                <h3>Lucky Number</h3>
+
+                                <p>
+                                    Unlock a special number bonus.
+                                </p>
+
+                                <span class="item-status" id="luckyNumberStatus">
+                                    Locked
+                                </span>
+
+                            </div>
+
+                            <button
+                                class="shop-buy"
+                                id="luckyNumberButton"
+                                onclick="buyItem('luckyNumber')"
+                            >
+                                🪙 250
+                            </button>
+
+                        </article>
+
+
+                        <!-- XP BOOST -->
+
+                        <article class="shop-item">
+
+                            <div class="shop-icon">⭐</div>
+
+                            <div class="shop-info">
+
+                                <h3>XP Boost</h3>
+
+                                <p>
+                                    Gain extra XP from successful rounds.
+                                </p>
+
+                                <span class="item-status" id="xpBoostStatus">
+                                    Locked
+                                </span>
+
+                            </div>
+
+                            <button
+                                class="shop-buy"
+                                id="xpBoostButton"
+                                onclick="buyItem('xpBoost')"
+                            >
+                                🪙 300
+                            </button>
+
+                        </article>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 PROFILE SCREEN
+            ================================================== -->
+
+            <section
+                id="profileScreen"
+                class="screen"
+            >
+
+                <div class="panel profile-panel">
+
+                    <div class="screen-heading">
+
+                        <span class="eyebrow">PLAYER DATA</span>
+
+                        <h2>🏆 Profile</h2>
+
+                        <p>
+                            Track your progress and achievements.
+                        </p>
+
+                    </div>
+
+
+                    <!-- PLAYER LEVEL -->
+
+                    <div class="profile-level">
+
+                        <div class="profile-level-number">
+                            <span>LEVEL</span>
+                            <strong id="profileLevel">1</strong>
+                        </div>
+
+                        <div class="xp-progress">
+
+                            <div class="xp-label">
+                                <span>XP Progress</span>
+
+                                <strong>
+                                    <span id="profileXP">0</span>
+                                    /
+                                    <span id="xpNeeded">100</span>
+                                </strong>
+                            </div>
+
+                            <div class="xp-bar">
+                                <div
+                                    id="xpFill"
+                                    class="xp-fill"
+                                ></div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- STAT GRID -->
+
+                    <div class="profile-stats">
+
+                        <div class="profile-stat">
+                            <span>🪙</span>
+                            <small>Total Coins</small>
+                            <strong id="profileCoins">0</strong>
+                        </div>
+
+                        <div class="profile-stat">
+                            <span>🎯</span>
+                            <small>Total Wins</small>
+                            <strong id="totalWins">0</strong>
+                        </div>
+
+                        <div class="profile-stat">
+                            <span>🔥</span>
+                            <small>Best Streak</small>
+                            <strong id="bestStreak">0</strong>
+                        </div>
+
+                        <div class="profile-stat">
+                            <span>🏆</span>
+                            <small>Achievements</small>
+                            <strong id="achievementCount">
+                                0 / 6
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <!-- ACHIEVEMENTS -->
+
+                    <div class="achievements-section">
+
+                        <div class="section-title">
+
+                            <div>
+                                <span class="eyebrow">
+                                    MILESTONES
+                                </span>
+
+                                <h3>🏆 Achievements</h3>
+                            </div>
+
+                        </div>
+
+
+                        <div class="achievement-grid">
+
+
+                            <div
+                                class="achievement locked-achievement"
+                                id="achievementFirstStrike"
+                            >
+
+                                <span>🎯</span>
+
+                                <div>
+                                    <strong>First Strike</strong>
+                                    <small>Win your first game</small>
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                class="achievement locked-achievement"
+                                id="achievementCoinHunter"
+                            >
+
+                                <span>🪙</span>
+
+                                <div>
+                                    <strong>Coin Hunter</strong>
+                                    <small>Earn 500 coins</small>
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                class="achievement locked-achievement"
+                                id="achievementLevelThree"
+                            >
+
+                                <span>⚡</span>
+
+                                <div>
+                                    <strong>Rising Star</strong>
+                                    <small>Unlock Level 3</small>
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                class="achievement locked-achievement"
+                                id="achievementLevelFive"
+                            >
+
+                                <span>🚀</span>
+
+                                <div>
+                                    <strong>Elite Player</strong>
+                                    <small>Unlock Level 5</small>
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                class="achievement locked-achievement"
+                                id="achievementLevelEight"
+                            >
+
+                                <span>👑</span>
+
+                                <div>
+                                    <strong>The Legend</strong>
+                                    <small>Reach Level 8</small>
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                class="achievement locked-achievement"
+                                id="achievementStreak"
+                            >
+
+                                <span>🔥</span>
+
+                                <div>
+                                    <strong>On Fire</strong>
+                                    <small>Win 5 games</small>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+
+        <!-- =================================================
+             LEVEL UP OVERLAY
+             IMPORTANT: INSIDE APP
+        ================================================== -->
+
+        <div
+            id="levelUpOverlay"
+            class="game-overlay hidden"
+        >
+
+            <div class="overlay-card level-up-card">
+
+                <button
+                    class="overlay-close"
+                    onclick="closeLevelUp()"
+                    aria-label="Close"
+                >
+                    ✕
+                </button>
+
+                <div class="overlay-icon">
+                    🚀
+                </div>
+
+                <span class="eyebrow">
+                    PROGRESSION COMPLETE
+                </span>
+
+                <h2>LEVEL UP!</h2>
+
+                <p>
+                    You reached
+                </p>
+
+                <strong id="newLevelNumber">
+                    LEVEL 2
+                </strong>
+
+                <div class="overlay-reward">
+                    ⭐ XP BONUS
+                </div>
+
+                <button
+                    class="primary-button"
+                    onclick="closeLevelUp()"
+                >
+                    LET'S GO!
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ACHIEVEMENT OVERLAY
+             IMPORTANT: INSIDE APP
+        ================================================== -->
+
+        <div
+            id="achievementOverlay"
+            class="game-overlay hidden"
+        >
+
+            <div class="overlay-card achievement-card">
+
+                <button
+                    class="overlay-close"
+                    onclick="closeAchievement()"
+                    aria-label="Close"
+                >
+                    ✕
+                </button>
+
+                <div class="overlay-icon">
+                    🏆
+                </div>
+
+                <span class="eyebrow">
+                    ACHIEVEMENT UNLOCKED
+                </span>
+
+                <h2 id="achievementTitle">
+                    First Strike
+                </h2>
+
+                <p id="achievementDescription">
+                    You won your first game!
+                </p>
+
+                <div class="overlay-reward">
+                    🪙 +50 COINS
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TOAST
+             NOT A BROWSER ALERT
+        ================================================== -->
+
+        <div
+            id="toast"
+            class="toast hidden"
+            aria-live="polite"
+        >
+            <span id="toastIcon">✨</span>
+            <span id="toastMessage">Nice!</span>
+        </div>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
     <script>
 
-        // =========================
-        // GAME VARIABLES
-        // =========================
+        /* =================================================
+           GAME DATA
+        ================================================== */
+
+        const levels = {
+
+            1: {
+                maximum: 10,
+                lives: 5,
+                reward: 25,
+                xp: 25
+            },
+
+            2: {
+                maximum: 50,
+                lives: 6,
+                reward: 40,
+                xp: 35
+            },
+
+            3: {
+                maximum: 100,
+                lives: 7,
+                reward: 60,
+                xp: 45
+            },
+
+            4: {
+                maximum: 1000,
+                lives: 8,
+                reward: 90,
+                xp: 60
+            },
+
+            5: {
+                maximum: 10000,
+                lives: 9,
+                reward: 125,
+                xp: 80
+            },
+
+            6: {
+                maximum: 100000,
+                lives: 10,
+                reward: 175,
+                xp: 100
+            },
+
+            7: {
+                maximum: 500000,
+                lives: 11,
+                reward: 250,
+                xp: 125
+            },
+
+            8: {
+                maximum: 1000000,
+                lives: 12,
+                reward: 400,
+                xp: 150
+            }
+
+        };
+
+
+        /* =================================================
+           SAVE DATA
+        ================================================== */
+
+        const defaultSave = {
+
+            coins: 0,
+
+            xp: 0,
+
+            playerLevel: 1,
+
+            unlockedLevel: 1,
+
+            totalWins: 0,
+
+            bestStreak: 0,
+
+            currentStreak: 0,
+
+            bestScores: {},
+
+            achievements: [],
+
+            items: {
+
+                coinBoost: false,
+
+                extraLife: false,
+
+                luckyNumber: false,
+
+                xpBoost: false
+
+            }
+
+        };
+
+
+        let save = loadSave();
+
+
+        function loadSave() {
+
+            try {
+
+                const stored =
+                    localStorage.getItem(
+                        "guessNumberSave"
+                    );
+
+                if (!stored) {
+
+                    return structuredClone(defaultSave);
+
+                }
+
+                const parsed =
+                    JSON.parse(stored);
+
+                return {
+
+                    ...structuredClone(defaultSave),
+
+                    ...parsed,
+
+                    items: {
+
+                        ...structuredClone(
+                            defaultSave.items
+                        ),
+
+                        ...(parsed.items || {})
+
+                    }
+
+                };
+
+            }
+
+            catch (error) {
+
+                return structuredClone(defaultSave);
+
+            }
+
+        }
+
+
+        function saveGame() {
+
+            localStorage.setItem(
+                "guessNumberSave",
+                JSON.stringify(save)
+            );
+
+        }
+
+
+        /* =================================================
+           CURRENT GAME
+        ================================================== */
+
+        let currentLevel = 1;
 
         let secretNumber = 0;
-        let maximum = 10;
 
         let attempts = 0;
-        let lives = 5;
 
-        let bestScore = null;
+        let lives = 5;
 
         let gameActive = false;
 
+        let levelUpTimer = null;
 
-        // =========================
-        // START GAME
-        // =========================
+        let achievementTimer = null;
 
-        function startGame(maxNumber) {
 
-            maximum = maxNumber;
+        /* =================================================
+           SOUND SYSTEM
+        ================================================== */
 
-            secretNumber = Math.floor(
-                Math.random() * maximum
-            ) + 1;
+        let audioContext = null;
+
+
+        function getAudioContext() {
+
+            if (!audioContext) {
+
+                audioContext =
+                    new (
+                        window.AudioContext ||
+                        window.webkitAudioContext
+                    )();
+
+            }
+
+            if (
+                audioContext.state ===
+                "suspended"
+            ) {
+
+                audioContext.resume();
+
+            }
+
+            return audioContext;
+
+        }
+
+
+        function playSound(
+            frequency = 440,
+            duration = 0.08,
+            type = "sine"
+        ) {
+
+            try {
+
+                const ctx =
+                    getAudioContext();
+
+                const oscillator =
+                    ctx.createOscillator();
+
+                const gain =
+                    ctx.createGain();
+
+                oscillator.type = type;
+
+                oscillator.frequency.value =
+                    frequency;
+
+                gain.gain.setValueAtTime(
+                    0.05,
+                    ctx.currentTime
+                );
+
+                gain.gain.exponentialRampToValueAtTime(
+                    0.001,
+                    ctx.currentTime + duration
+                );
+
+                oscillator.connect(gain);
+
+                gain.connect(ctx.destination);
+
+                oscillator.start();
+
+                oscillator.stop(
+                    ctx.currentTime + duration
+                );
+
+            }
+
+            catch (error) {
+
+                // Sound is optional.
+                // The game continues if audio is unavailable.
+
+            }
+
+        }
+
+
+        function playCorrectSound() {
+
+            playSound(523, 0.08);
+
+            setTimeout(
+                () => playSound(659, 0.1),
+                80
+            );
+
+            setTimeout(
+                () => playSound(784, 0.14),
+                160
+            );
+
+        }
+
+
+        function playWrongSound() {
+
+            playSound(
+                180,
+                0.16,
+                "square"
+            );
+
+        }
+
+
+        function playLevelUpSound() {
+
+            playSound(523, 0.1);
+
+            setTimeout(
+                () => playSound(659, 0.1),
+                100
+            );
+
+            setTimeout(
+                () => playSound(784, 0.1),
+                200
+            );
+
+            setTimeout(
+                () => playSound(1046, 0.2),
+                300
+            );
+
+        }
+
+
+        /* =================================================
+           SCREEN NAVIGATION
+        ================================================== */
+
+        function showScreen(screenId) {
+
+            document
+                .querySelectorAll(".screen")
+                .forEach(screen => {
+
+                    screen.classList.remove(
+                        "active-screen"
+                    );
+
+                });
+
+
+            document
+                .querySelectorAll(".nav-button")
+                .forEach(button => {
+
+                    button.classList.remove(
+                        "active"
+                    );
+
+                });
+
+
+            const screen =
+                document.getElementById(screenId);
+
+            if (screen) {
+
+                screen.classList.add(
+                    "active-screen"
+                );
+
+            }
+
+
+            const navButton =
+                document.querySelector(
+                    `.nav-button[data-screen="${screenId}"]`
+                );
+
+            if (navButton) {
+
+                navButton.classList.add(
+                    "active"
+                );
+
+            }
+
+
+            playSound(
+                330,
+                0.05
+            );
+
+        }
+
+
+        /* =================================================
+           SELECT LEVEL
+        ================================================== */
+
+        function selectLevel(levelNumber) {
+
+            if (
+                levelNumber >
+                save.unlockedLevel
+            ) {
+
+                showToast(
+                    "🔒",
+                    "Unlock this level first!"
+                );
+
+                playWrongSound();
+
+                return;
+
+            }
+
+
+            currentLevel =
+                levelNumber;
+
+            updateLevelButtons();
+
+            startLevel();
+
+        }
+
+
+        /* =================================================
+           START LEVEL
+        ================================================== */
+
+        function startLevel() {
+
+            const level =
+                levels[currentLevel];
+
+
+            secretNumber =
+                Math.floor(
+                    Math.random() *
+                    level.maximum
+                ) + 1;
+
 
             attempts = 0;
-            lives = 5;
+
+            lives =
+                level.lives;
+
+
+            if (
+                save.items.extraLife
+            ) {
+
+                lives++;
+
+            }
+
 
             gameActive = true;
 
 
-            // Reset display
-
-            document.getElementById("attempts").textContent = attempts;
-
-            document.getElementById("lives").textContent = lives;
-
-            document.getElementById("result").textContent = "";
-
-            document.getElementById("gameMessage").textContent =
-                `I'm thinking of a number from 1 to ${maximum}!`;
+            document
+                .getElementById("lives")
+                .textContent = lives;
 
 
-            // Enable game controls
-
-            document.getElementById("guess").disabled = false;
-
-            document.getElementById("guessButton").disabled = false;
-
-            document.getElementById("guess").value = "";
-
-            document.getElementById("guess").focus();
+            document
+                .getElementById("attempts")
+                .textContent = attempts;
 
 
-            // Update best score display
+            document
+                .getElementById("bestScore")
+                .textContent =
+                    save.bestScores[currentLevel] ||
+                    "---";
 
-            if (bestScore === null) {
 
-                document.getElementById("bestScore").textContent = "---";
+            document
+                .getElementById("gameTitle")
+                .textContent =
+                    `Level ${currentLevel}`;
 
-            } else {
 
-                document.getElementById("bestScore").textContent =
-                    bestScore;
+            document
+                .getElementById("gameMessage")
+                .textContent =
+                    `I'm thinking of a number from 1 to ${level.maximum.toLocaleString()}!`;
 
-            }
+
+            document
+                .getElementById("result")
+                .textContent = "";
+
+
+            const guess =
+                document.getElementById(
+                    "guess"
+                );
+
+            const guessButton =
+                document.getElementById(
+                    "guessButton"
+                );
+
+
+            guess.disabled = false;
+
+            guessButton.disabled = false;
+
+            guess.value = "";
+
+            guess.min = 1;
+
+            guess.max =
+                level.maximum;
+
+            guess.focus();
+
+
+            playSound(
+                440,
+                0.07
+            );
+
         }
 
 
-        // =========================
-        // CHECK GUESS
-        // =========================
+        /* =================================================
+           CHECK GUESS
+        ================================================== */
 
         function checkGuess() {
 
             if (!gameActive) {
+
                 return;
+
             }
 
 
-            const guessInput =
-                document.getElementById("guess");
+            const input =
+                document.getElementById(
+                    "guess"
+                );
+
 
             const result =
-                document.getElementById("result");
+                document.getElementById(
+                    "result"
+                );
+
 
             const guess =
-                Number(guessInput.value);
+                Number(input.value);
 
 
-            // Check valid number
+            const maximum =
+                levels[currentLevel]
+                    .maximum;
+
 
             if (
+                !Number.isInteger(guess) ||
                 guess < 1 ||
-                guess > maximum ||
-                !guess
+                guess > maximum
             ) {
 
                 result.textContent =
-                    `⚠️ Enter a number from 1 to ${maximum}!`;
+                    `⚠️ Enter a whole number from 1 to ${maximum.toLocaleString()}!`;
 
                 return;
+
             }
 
-
-            // Count attempt
 
             attempts++;
 
-            document.getElementById("attempts").textContent =
-                attempts;
+
+            document
+                .getElementById("attempts")
+                .textContent =
+                    attempts;
 
 
-            // CORRECT
+            /* =============================================
+               CORRECT
+            ============================================== */
 
-            if (guess === secretNumber) {
+            if (
+                guess ===
+                secretNumber
+            ) {
 
-                result.textContent =
-                    "🎉 CORRECT!";
-
-                result.classList.remove(
-                    "correct-animation"
-                );
-
-                void result.offsetWidth;
-
-                result.classList.add(
-                    "correct-animation"
-                );
-
-
-                // Check high score
-
-                if (
-                    bestScore === null ||
-                    attempts < bestScore
-                ) {
-
-                    bestScore = attempts;
-
-                    document.getElementById("bestScore")
-                        .textContent = bestScore;
-
-                    document.getElementById("gameMessage")
-                        .textContent =
-                        "🏆 NEW HIGH SCORE!";
-                }
-
-                else {
-
-                    document.getElementById("gameMessage")
-                        .textContent =
-                        "🎉 You got it!";
-                }
-
-
-                // End round
-
-                gameActive = false;
-
-                disableGame();
+                handleWin();
 
                 return;
+
             }
 
 
-            // WRONG GUESS
+            /* =============================================
+               WRONG
+            ============================================== */
 
-            if (guess < secretNumber) {
+            lives--;
+
+
+            document
+                .getElementById("lives")
+                .textContent =
+                    lives;
+
+
+            playWrongSound();
+
+
+            if (
+                guess <
+                secretNumber
+            ) {
 
                 result.textContent =
                     "📉 Too low!";
 
-            } else {
+            }
+
+            else {
 
                 result.textContent =
                     "📈 Too high!";
+
             }
 
 
-            // Remove a life
+            input.value = "";
 
-            lives--;
-
-            document.getElementById("lives").textContent =
-                lives;
-
-
-            // GAME OVER
 
             if (lives <= 0) {
 
-                result.textContent =
-                    "💀 GAME OVER!";
-
-                document.getElementById("gameMessage")
-                    .textContent =
-                    `The number was ${secretNumber}.`;
-
-                gameActive = false;
-
-                disableGame();
+                handleGameOver();
 
                 return;
+
             }
 
 
-            // Clear input
+            input.focus();
 
-            guessInput.value = "";
-
-            guessInput.focus();
         }
 
 
-        // =========================
-        // DISABLE GAME
-        // =========================
+        /* =================================================
+           HANDLE WIN
+        ================================================== */
 
-        function disableGame() {
+        function handleWin() {
 
-            document.getElementById("guess").disabled = true;
+            const level =
+                levels[currentLevel];
 
-            document.getElementById("guessButton").disabled = true;
-        }
-
-
-        // =========================
-        // NEW GAME
-        // =========================
-
-        function resetGame() {
-
-            maximum = 10;
-
-            secretNumber = 0;
-
-            attempts = 0;
-
-            lives = 5;
 
             gameActive = false;
 
 
-            document.getElementById("attempts")
-                .textContent = "0";
+            disableGame();
 
-            document.getElementById("lives")
-                .textContent = "5";
 
-            document.getElementById("result")
-                .textContent = "";
+            playCorrectSound();
 
-            document.getElementById("gameMessage")
+
+            document
+                .getElementById("result")
                 .textContent =
-                "Choose a difficulty to begin!";
+                    "🎉 CORRECT!";
 
 
-            document.getElementById("guess")
-                .value = "";
+            document
+                .getElementById("result")
+                .classList.remove(
+                    "correct-animation"
+                );
 
-            document.getElementById("guess")
-                .disabled = true;
 
-            document.getElementById("guessButton")
-                .disabled = true;
+            void document
+                .getElementById("result")
+                .offsetWidth;
+
+
+            document
+                .getElementById("result")
+                .classList.add(
+                    "correct-animation"
+                );
+
+
+            /* =============================================
+               COINS
+            ============================================== */
+
+            let coinReward =
+                level.reward;
+
+
+            if (
+                save.items.coinBoost
+            ) {
+
+                coinReward *= 2;
+
+            }
+
+
+            save.coins +=
+                coinReward;
+
+
+            /* =============================================
+               XP
+            ============================================== */
+
+            let xpReward =
+                level.xp;
+
+
+            if (
+                save.items.xpBoost
+            ) {
+
+                xpReward = Math.floor(
+                    xpReward * 1.5
+                );
+
+            }
+
+
+            save.xp +=
+                xpReward;
+
+
+            /* =============================================
+               WINS + STREAK
+            ============================================== */
+
+            save.totalWins++;
+
+            save.currentStreak++;
+
+
+            if (
+                save.currentStreak >
+                save.bestStreak
+            ) {
+
+                save.bestStreak =
+                    save.currentStreak;
+
+            }
+
+
+            /* =============================================
+               BEST SCORE
+            ============================================== */
+
+            if (
+                !save.bestScores[currentLevel] ||
+                attempts <
+                save.bestScores[currentLevel]
+            ) {
+
+                save.bestScores[currentLevel] =
+                    attempts;
+
+            }
+
+
+            /* =============================================
+               UNLOCK NEXT LEVEL
+            ============================================== */
+
+            if (
+                currentLevel <
+                8 &&
+                currentLevel >=
+                save.unlockedLevel
+            ) {
+
+                save.unlockedLevel =
+                    currentLevel + 1;
+
+            }
+
+
+            /* =============================================
+               PLAYER LEVEL
+            ============================================== */
+
+            const oldPlayerLevel =
+                save.playerLevel;
+
+
+            updatePlayerLevel();
+
+
+            const newPlayerLevel =
+                save.playerLevel;
+
+
+            /* =============================================
+               SAVE
+            ============================================== */
+
+            saveGame();
+
+
+            updateUI();
+
+            updateLevelButtons();
+
+
+            document
+                .getElementById("gameMessage")
+                .textContent =
+                    `🎉 +${coinReward} coins • +${xpReward} XP`;
+
+
+            showToast(
+                "🪙",
+                `+${coinReward} coins`
+            );
+
+
+            /* =============================================
+               ACHIEVEMENTS
+            ============================================== */
+
+            checkAchievements();
+
+
+            /* =============================================
+               LEVEL UP
+            ============================================== */
+
+            if (
+                newPlayerLevel >
+                oldPlayerLevel
+            ) {
+
+                setTimeout(
+                    () => showLevelUp(
+                        newPlayerLevel
+                    ),
+                    500
+                );
+
+            }
+
         }
 
 
-        // =========================
-        // ENTER KEY SUPPORT
-        // =========================
+        /* =================================================
+           GAME OVER
+        ================================================== */
 
-        document.getElementById("guess")
-            .addEventListener("keydown", function(event) {
+        function handleGameOver() {
 
-                if (event.key === "Enter") {
+            gameActive = false;
 
-                    checkGuess();
+            disableGame();
+
+            save.currentStreak = 0;
+
+            saveGame();
+
+            updateUI();
+
+
+            document
+                .getElementById("result")
+                .textContent =
+                    "💀 GAME OVER!";
+
+
+            document
+                .getElementById("gameMessage")
+                .textContent =
+                    `The number was ${secretNumber.toLocaleString()}.`;
+
+
+            showToast(
+                "💀",
+                "Better luck next time!"
+            );
+
+        }
+
+
+        /* =================================================
+           DISABLE GAME
+        ================================================== */
+
+        function disableGame() {
+
+            document
+                .getElementById("guess")
+                .disabled = true;
+
+
+            document
+                .getElementById("guessButton")
+                .disabled = true;
+
+        }
+
+
+        /* =================================================
+           RESTART LEVEL
+        ================================================== */
+
+        function restartLevel() {
+
+            startLevel();
+
+            playSound(
+                330,
+                0.06
+            );
+
+        }
+
+
+        /* =================================================
+           PLAYER LEVEL CALCULATION
+        ================================================== */
+
+        function updatePlayerLevel() {
+
+            const calculatedLevel =
+                Math.floor(
+                    save.xp / 100
+                ) + 1;
+
+
+            if (
+                calculatedLevel >
+                save.playerLevel
+            ) {
+
+                save.playerLevel =
+                    calculatedLevel;
+
+            }
+
+        }
+
+
+        /* =================================================
+           UPDATE UI
+        ================================================== */
+
+        function updateUI() {
+
+            document
+                .getElementById("coins")
+                .textContent =
+                    save.coins.toLocaleString();
+
+
+            document
+                .getElementById("xp")
+                .textContent =
+                    save.xp.toLocaleString();
+
+
+            document
+                .getElementById("playerLevel")
+                .textContent =
+                    save.playerLevel;
+
+
+            document
+                .getElementById("shopCoins")
+                .textContent =
+                    save.coins.toLocaleString();
+
+
+            document
+                .getElementById("profileCoins")
+                .textContent =
+                    save.coins.toLocaleString();
+
+
+            document
+                .getElementById("profileXP")
+                .textContent =
+                    save.xp.toLocaleString();
+
+
+            document
+                .getElementById("profileLevel")
+                .textContent =
+                    save.playerLevel;
+
+
+            document
+                .getElementById("totalWins")
+                .textContent =
+                    save.totalWins;
+
+
+            document
+                .getElementById("bestStreak")
+                .textContent =
+                    save.bestStreak;
+
+
+            document
+                .getElementById("achievementCount")
+                .textContent =
+                    `${save.achievements.length} / 6`;
+
+
+            const xpIntoLevel =
+                save.xp % 100;
+
+
+            document
+                .getElementById("xpNeeded")
+                .textContent =
+                    "100";
+
+
+            document
+                .getElementById("xpFill")
+                .style.width =
+                    `${xpIntoLevel}%`;
+
+
+            updateShop();
+
+            updateAchievements();
+
+        }
+
+
+        /* =================================================
+           LEVEL BUTTONS
+        ================================================== */
+
+        function updateLevelButtons() {
+
+            document
+                .querySelectorAll(".level-button")
+                .forEach(button => {
+
+                    const level =
+                        Number(
+                            button.dataset.level
+                        );
+
+
+                    button.classList.remove(
+                        "selected"
+                    );
+
+
+                    if (
+                        level ===
+                        currentLevel
+                    ) {
+
+                        button.classList.add(
+                            "selected"
+                        );
+
+                    }
+
+
+                    if (
+                        level <=
+                        save.unlockedLevel
+                    ) {
+
+                        button.classList.remove(
+                            "locked"
+                        );
+
+
+                        const icon =
+                            button.querySelector(
+                                ".level-icon"
+                            );
+
+
+                        if (icon) {
+
+                            icon.textContent =
+                                level ===
+                                currentLevel
+                                    ? "⚡"
+                                    : "✓";
+
+                        }
+
+                    }
+
+                    else {
+
+                        button.classList.add(
+                            "locked"
+                        );
+
+                        const icon =
+                            button.querySelector(
+                                ".level-icon"
+                            );
+
+
+                        if (icon) {
+
+                            icon.textContent =
+                                "🔒";
+
+                        }
+
+                    }
+
+                });
+
+
+            document
+                .getElementById(
+                    "levelCounter"
+                )
+                .textContent =
+                    `${save.unlockedLevel} / 8`;
+
+        }
+
+
+        /* =================================================
+           SHOP
+        ================================================== */
+
+        const shopItems = {
+
+            coinBoost: {
+                cost: 100
+            },
+
+            extraLife: {
+                cost: 150
+            },
+
+            luckyNumber: {
+                cost: 250
+            },
+
+            xpBoost: {
+                cost: 300
+            }
+
+        };
+
+
+        function buyItem(itemName) {
+
+            const item =
+                shopItems[itemName];
+
+
+            if (!item) {
+
+                return;
+
+            }
+
+
+            if (
+                save.items[itemName]
+            ) {
+
+                showToast(
+                    "✓",
+                    "Already unlocked!"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                save.coins <
+                item.cost
+            ) {
+
+                showToast(
+                    "🪙",
+                    "Not enough coins!"
+                );
+
+                playWrongSound();
+
+                return;
+
+            }
+
+
+            save.coins -=
+                item.cost;
+
+
+            save.items[itemName] =
+                true;
+
+
+            saveGame();
+
+            updateUI();
+
+
+            playCorrectSound();
+
+
+            showToast(
+                "🛒",
+                "Upgrade unlocked!"
+            );
+
+        }
+
+
+        function updateShop() {
+
+            Object.keys(shopItems)
+                .forEach(itemName => {
+
+                    const status =
+                        document.getElementById(
+                            `${itemName}Status`
+                        );
+
+                    const button =
+                        document.getElementById(
+                            `${itemName}Button`
+                        );
+
+
+                    if (
+                        save.items[itemName]
+                    ) {
+
+                        status.textContent =
+                            "✓ UNLOCKED";
+
+
+                        status.classList.add(
+                            "unlocked"
+                        );
+
+
+                        button.textContent =
+                            "✓ OWNED";
+
+
+                        button.disabled =
+                            true;
+
+                    }
+
+                    else {
+
+                        status.textContent =
+                            "Locked";
+
+
+                        status.classList.remove(
+                            "unlocked"
+                        );
+
+
+                        button.disabled =
+                            save.coins <
+                            shopItems[itemName]
+                                .cost;
+
+                    }
+
+                });
+
+        }
+
+
+        /* =================================================
+           ACHIEVEMENTS
+        ================================================== */
+
+        const achievementData = {
+
+            firstStrike: {
+
+                title: "First Strike",
+
+                description:
+                    "Win your first game",
+
+                reward: 50
+
+            },
+
+            coinHunter: {
+
+                title: "Coin Hunter",
+
+                description:
+                    "Earn 500 coins",
+
+                reward: 100
+
+            },
+
+            levelThree: {
+
+                title: "Rising Star",
+
+                description:
+                    "Unlock Level 3",
+
+                reward: 100
+
+            },
+
+            levelFive: {
+
+                title: "Elite Player",
+
+                description:
+                    "Unlock Level 5",
+
+                reward: 200
+
+            },
+
+            levelEight: {
+
+                title: "The Legend",
+
+                description:
+                    "Reach Level 8",
+
+                reward: 500
+
+            },
+
+            streak: {
+
+                title: "On Fire",
+
+                description:
+                    "Win 5 games",
+
+                reward: 150
+
+            }
+
+        };
+
+
+        function checkAchievements() {
+
+            let unlockedNow = null;
+
+
+            if (
+                save.totalWins >= 1
+            ) {
+
+                unlockedNow =
+                    unlockAchievement(
+                        "firstStrike"
+                    ) ||
+                    unlockedNow;
+
+            }
+
+
+            if (
+                save.coins >= 500
+            ) {
+
+                unlockedNow =
+                    unlockAchievement(
+                        "coinHunter"
+                    ) ||
+                    unlockedNow;
+
+            }
+
+
+            if (
+                save.unlockedLevel >= 3
+            ) {
+
+                unlockedNow =
+                    unlockAchievement(
+                        "levelThree"
+                    ) ||
+                    unlockedNow;
+
+            }
+
+
+            if (
+                save.unlockedLevel >= 5
+            ) {
+
+                unlockedNow =
+                    unlockAchievement(
+                        "levelFive"
+                    ) ||
+                    unlockedNow;
+
+            }
+
+
+            if (
+                save.unlockedLevel >= 8
+            ) {
+
+                unlockedNow =
+                    unlockAchievement(
+                        "levelEight"
+                    ) ||
+                    unlockedNow;
+
+            }
+
+
+            if (
+                save.totalWins >= 5
+            ) {
+
+                unlockedNow =
+                    unlockAchievement(
+                        "streak"
+                    ) ||
+                    unlockedNow;
+
+            }
+
+
+            if (unlockedNow) {
+
+                updateUI();
+
+            }
+
+        }
+
+
+        function unlockAchievement(
+            achievementName
+        ) {
+
+            if (
+                save.achievements.includes(
+                    achievementName
+                )
+            ) {
+
+                return false;
+
+            }
+
+
+            save.achievements.push(
+                achievementName
+            );
+
+
+            const achievement =
+                achievementData[
+                    achievementName
+                ];
+
+
+            save.coins +=
+                achievement.reward;
+
+
+            saveGame();
+
+
+            setTimeout(
+                () => {
+
+                    showAchievement(
+                        achievement
+                    );
+
+                },
+                300
+            );
+
+
+            return true;
+
+        }
+
+
+        function updateAchievements() {
+
+            const map = {
+
+                firstStrike:
+                    "achievementFirstStrike",
+
+                coinHunter:
+                    "achievementCoinHunter",
+
+                levelThree:
+                    "achievementLevelThree",
+
+                levelFive:
+                    "achievementLevelFive",
+
+                levelEight:
+                    "achievementLevelEight",
+
+                streak:
+                    "achievementStreak"
+
+            };
+
+
+            Object.keys(map)
+                .forEach(name => {
+
+                    const element =
+                        document.getElementById(
+                            map[name]
+                        );
+
+
+                    if (
+                        save.achievements
+                            .includes(name)
+                    ) {
+
+                        element.classList.add(
+                            "unlocked-achievement"
+                        );
+
+                        element.classList.remove(
+                            "locked-achievement"
+                        );
+
+                    }
+
+                });
+
+        }
+
+
+        /* =================================================
+           LEVEL UP OVERLAY
+        ================================================== */
+
+        function showLevelUp(level) {
+
+            const overlay =
+                document.getElementById(
+                    "levelUpOverlay"
+                );
+
+
+            document
+                .getElementById(
+                    "newLevelNumber"
+                )
+                .textContent =
+                    `LEVEL ${level}`;
+
+
+            overlay.classList.remove(
+                "hidden"
+            );
+
+
+            playLevelUpSound();
+
+
+            clearTimeout(
+                levelUpTimer
+            );
+
+
+            levelUpTimer =
+                setTimeout(
+                    closeLevelUp,
+                    5000
+                );
+
+        }
+
+
+        function closeLevelUp() {
+
+            const overlay =
+                document.getElementById(
+                    "levelUpOverlay"
+                );
+
+
+            overlay.classList.add(
+                "hidden"
+            );
+
+
+            clearTimeout(
+                levelUpTimer
+            );
+
+        }
+
+
+        /* =================================================
+           ACHIEVEMENT OVERLAY
+        ================================================== */
+
+        function showAchievement(
+            achievement
+        ) {
+
+            const overlay =
+                document.getElementById(
+                    "achievementOverlay"
+                );
+
+
+            document
+                .getElementById(
+                    "achievementTitle"
+                )
+                .textContent =
+                    achievement.title;
+
+
+            document
+                .getElementById(
+                    "achievementDescription"
+                )
+                .textContent =
+                    achievement.description;
+
+
+            overlay
+                .querySelector(
+                    ".overlay-reward"
+                )
+                .textContent =
+                    `🪙 +${achievement.reward} COINS`;
+
+
+            overlay.classList.remove(
+                "hidden"
+            );
+
+
+            playLevelUpSound();
+
+
+            clearTimeout(
+                achievementTimer
+            );
+
+
+            achievementTimer =
+                setTimeout(
+                    closeAchievement,
+                    5000
+                );
+
+        }
+
+
+        function closeAchievement() {
+
+            const overlay =
+                document.getElementById(
+                    "achievementOverlay"
+                );
+
+
+            overlay.classList.add(
+                "hidden"
+            );
+
+
+            clearTimeout(
+                achievementTimer
+            );
+
+        }
+
+
+        /* =================================================
+           TOAST
+        ================================================== */
+
+        let toastTimer = null;
+
+
+        function showToast(
+            icon,
+            message
+        ) {
+
+            const toast =
+                document.getElementById(
+                    "toast"
+                );
+
+
+            document
+                .getElementById(
+                    "toastIcon"
+                )
+                .textContent =
+                    icon;
+
+
+            document
+                .getElementById(
+                    "toastMessage"
+                )
+                .textContent =
+                    message;
+
+
+            toast.classList.remove(
+                "hidden"
+            );
+
+
+            clearTimeout(
+                toastTimer
+            );
+
+
+            toastTimer =
+                setTimeout(
+                    () => {
+
+                        toast.classList.add(
+                            "hidden"
+                        );
+
+                    },
+                    2500
+                );
+
+        }
+
+
+        /* =================================================
+           ENTER KEY
+        ================================================== */
+
+        document
+            .getElementById("guess")
+            .addEventListener(
+                "keydown",
+                function(event) {
+
+                    if (
+                        event.key ===
+                        "Enter"
+                    ) {
+
+                        checkGuess();
+
+                    }
+
+                }
+            );
+
+
+        /* =================================================
+           ESCAPE CLOSES OVERLAYS
+        ================================================== */
+
+        document.addEventListener(
+            "keydown",
+            function(event) {
+
+                if (
+                    event.key ===
+                    "Escape"
+                ) {
+
+                    closeLevelUp();
+
+                    closeAchievement();
 
                 }
 
-            });
+            }
+        );
+
+
+        /* =================================================
+           INITIALIZE
+        ================================================== */
+
+        updateUI();
+
+        updateLevelButtons();
+
+        startLevel();
+
 
     </script>
 
