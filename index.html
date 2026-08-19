@@ -8,6 +8,14 @@
     <title>Guess the Number</title>
 
     <link rel="stylesheet" href="style.css">
+
+    <!-- =====================================================
+         FIREBASE (for the online leaderboard)
+         Loaded from Google's CDN — no build step needed.
+    ====================================================== -->
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 
 <body>
@@ -20,6 +28,8 @@
         <div class="orb orb-one"></div>
         <div class="orb orb-two"></div>
         <div class="grid"></div>
+        <div class="perspective-grid"></div>
+        <div class="particles" id="particles"></div>
     </div>
 
 
@@ -73,6 +83,19 @@
                     </div>
                 </div>
 
+                <button
+                    class="hud-item music-toggle"
+                    id="musicToggle"
+                    onclick="toggleMusic()"
+                    aria-label="Toggle background music"
+                >
+                    <span id="musicIcon">🔇</span>
+                    <div>
+                        <small>Music</small>
+                        <strong id="musicLabel">Off</strong>
+                    </div>
+                </button>
+
             </div>
 
         </header>
@@ -108,6 +131,14 @@
                 🏆 Profile
             </button>
 
+            <button
+                class="nav-button"
+                data-screen="leaderboardScreen"
+                onclick="showScreen('leaderboardScreen')"
+            >
+                🌐 Leaderboard
+            </button>
+
         </nav>
 
 
@@ -126,6 +157,98 @@
                 id="gameScreen"
                 class="screen active-screen"
             >
+
+                <!-- GAME PANEL -->
+
+                <div class="panel game-panel">
+
+                    <div class="game-status">
+
+                        <div class="status-item">
+                            <span>❤️</span>
+                            <div>
+                                <small>Lives</small>
+                                <strong id="lives">5</strong>
+                            </div>
+                        </div>
+
+                        <div class="status-item">
+                            <span>🔢</span>
+                            <div>
+                                <small>Attempts</small>
+                                <strong id="attempts">0</strong>
+                            </div>
+                        </div>
+
+                        <div class="status-item">
+                            <span>🏆</span>
+                            <div>
+                                <small>Best</small>
+                                <strong id="bestScore">---</strong>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="game-content">
+
+                        <span class="eyebrow">CURRENT MISSION</span>
+
+                        <h2 id="gameTitle">
+                            Guess the Number
+                        </h2>
+
+                        <p id="gameMessage">
+                            Choose a level to begin!
+                        </p>
+
+
+                        <!-- GUESS AREA -->
+
+                        <div class="guess-area">
+
+                            <input
+                                type="number"
+                                id="guess"
+                                placeholder="Your guess"
+                                disabled
+                                autocomplete="off"
+                            >
+
+                            <button
+                                id="guessButton"
+                                class="primary-button"
+                                onclick="checkGuess()"
+                                disabled
+                            >
+                                GUESS
+                            </button>
+
+                        </div>
+
+
+                        <div
+                            id="result"
+                            class="result"
+                            aria-live="polite"
+                        ></div>
+
+
+                        <!-- RESTART -->
+
+                        <button
+                            id="restartButton"
+                            class="secondary-button"
+                            onclick="restartLevel()"
+                        >
+                            🔄 Restart Level
+                        </button>
+
+                    </div>
+
+                </div>
+
 
                 <!-- LEVEL SELECTOR -->
 
@@ -240,98 +363,6 @@
                             <strong>Level 8</strong>
                             <small>1 – 1,000,000</small>
                             <em>12 ❤️</em>
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                <!-- GAME PANEL -->
-
-                <div class="panel game-panel">
-
-                    <div class="game-status">
-
-                        <div class="status-item">
-                            <span>❤️</span>
-                            <div>
-                                <small>Lives</small>
-                                <strong id="lives">5</strong>
-                            </div>
-                        </div>
-
-                        <div class="status-item">
-                            <span>🔢</span>
-                            <div>
-                                <small>Attempts</small>
-                                <strong id="attempts">0</strong>
-                            </div>
-                        </div>
-
-                        <div class="status-item">
-                            <span>🏆</span>
-                            <div>
-                                <small>Best</small>
-                                <strong id="bestScore">---</strong>
-                            </div>
-                        </div>
-
-                    </div>
-
-
-                    <div class="game-content">
-
-                        <span class="eyebrow">CURRENT MISSION</span>
-
-                        <h2 id="gameTitle">
-                            Guess the Number
-                        </h2>
-
-                        <p id="gameMessage">
-                            Choose a level to begin!
-                        </p>
-
-
-                        <!-- GUESS AREA -->
-
-                        <div class="guess-area">
-
-                            <input
-                                type="number"
-                                id="guess"
-                                placeholder="Your guess"
-                                disabled
-                                autocomplete="off"
-                            >
-
-                            <button
-                                id="guessButton"
-                                class="primary-button"
-                                onclick="checkGuess()"
-                                disabled
-                            >
-                                GUESS
-                            </button>
-
-                        </div>
-
-
-                        <div
-                            id="result"
-                            class="result"
-                            aria-live="polite"
-                        ></div>
-
-
-                        <!-- RESTART -->
-
-                        <button
-                            id="restartButton"
-                            class="secondary-button"
-                            onclick="restartLevel()"
-                        >
-                            🔄 Restart Level
                         </button>
 
                     </div>
@@ -710,6 +741,151 @@
 
             </section>
 
+
+            <!-- =================================================
+                 LEADERBOARD SCREEN
+            ================================================== -->
+
+            <section
+                id="leaderboardScreen"
+                class="screen"
+            >
+
+                <div class="panel leaderboard-panel">
+
+                    <div class="screen-heading">
+
+                        <span class="eyebrow">GLOBAL RANKINGS</span>
+
+                        <h2>🌐 Leaderboard</h2>
+
+                        <p>
+                            See how you stack up against players worldwide.
+                        </p>
+
+                    </div>
+
+
+                    <!-- USERNAME SETUP -->
+
+                    <div
+                        class="username-card"
+                        id="usernameCard"
+                    >
+
+                        <div class="username-row">
+
+                            <input
+                                type="text"
+                                id="usernameInput"
+                                placeholder="Choose a username"
+                                maxlength="20"
+                                autocomplete="off"
+                            >
+
+                            <button
+                                class="primary-button"
+                                onclick="saveUsername()"
+                            >
+                                SAVE
+                            </button>
+
+                        </div>
+
+                        <small
+                            class="username-hint"
+                            id="usernameHint"
+                        >
+                            Set a username to appear on the leaderboard.
+                        </small>
+
+                    </div>
+
+
+                    <!-- REFRESH BAR -->
+
+                    <div class="leaderboard-toolbar">
+
+                        <span
+                            class="leaderboard-you"
+                            id="leaderboardYou"
+                        ></span>
+
+                        <button
+                            class="secondary-button refresh-button"
+                            id="refreshButton"
+                            onclick="loadLeaderboard()"
+                        >
+                            🔄 Refresh
+                        </button>
+
+                    </div>
+
+
+                    <!-- LOADING STATE -->
+
+                    <div
+                        class="leaderboard-state hidden"
+                        id="leaderboardLoading"
+                    >
+
+                        <div class="spinner"></div>
+
+                        <p>Loading rankings…</p>
+
+                    </div>
+
+
+                    <!-- ERROR STATE -->
+
+                    <div
+                        class="leaderboard-state hidden"
+                        id="leaderboardError"
+                    >
+
+                        <span class="state-icon">⚠️</span>
+
+                        <p>
+                            Couldn't reach the leaderboard service.
+                        </p>
+
+                        <button
+                            class="secondary-button"
+                            onclick="loadLeaderboard()"
+                        >
+                            Try Again
+                        </button>
+
+                    </div>
+
+
+                    <!-- EMPTY STATE -->
+
+                    <div
+                        class="leaderboard-state hidden"
+                        id="leaderboardEmpty"
+                    >
+
+                        <span class="state-icon">🌌</span>
+
+                        <p>
+                            No scores yet. Be the first!
+                        </p>
+
+                    </div>
+
+
+                    <!-- RANKINGS LIST -->
+
+                    <div
+                        class="leaderboard-list"
+                        id="leaderboardList"
+                    ></div>
+
+                </div>
+
+            </section>
+
         </section>
 
 
@@ -837,6 +1013,74 @@
     <script>
 
         /* =================================================
+           FIREBASE / LEADERBOARD SETUP
+
+           1. Go to https://console.firebase.google.com
+           2. Create a free project (no credit card needed)
+           3. Add a "Web app" inside it — Firebase will
+              show you a config object like the one below.
+           4. Paste your own values in over these placeholders.
+           5. In the Firebase console, go to
+              Firestore Database → Create database →
+              start in "production mode".
+           6. Go to Firestore → Rules and paste in the
+              rules from the message I sent you, then Publish.
+        ================================================== */
+
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyC5mHrWzcQRZUpUVGmYa_KdMi2bUlNGdDc",
+            authDomain: "guess-game-trial.firebaseapp.com",
+            projectId: "guess-game-trial",
+            storageBucket: "guess-game-trial.firebasestorage.app",
+            messagingSenderId: "182844643075",
+            appId: "1:182844643075:web:a9f78ac851837ee981fb36"
+        };
+
+
+        let firestoreDB = null;
+
+        let firebaseReady = false;
+
+
+        function initFirebase() {
+
+            try {
+
+                if (
+                    FIREBASE_CONFIG.apiKey ===
+                    "YOUR_API_KEY"
+                ) {
+
+                    // Config hasn't been filled in yet.
+                    // Leaderboard will show the error state
+                    // until real credentials are added.
+
+                    return;
+
+                }
+
+
+                firebase.initializeApp(
+                    FIREBASE_CONFIG
+                );
+
+                firestoreDB =
+                    firebase.firestore();
+
+                firebaseReady = true;
+
+            }
+
+            catch (error) {
+
+                firebaseReady = false;
+
+            }
+
+        }
+
+
+        /* =================================================
            GAME DATA
         ================================================== */
 
@@ -924,6 +1168,8 @@
             bestScores: {},
 
             achievements: [],
+
+            username: "",
 
             items: {
 
@@ -1017,6 +1263,140 @@
         let levelUpTimer = null;
 
         let achievementTimer = null;
+
+
+        /* =================================================
+           PARTICLES
+        ================================================== */
+
+        function spawnParticles(count = 34) {
+
+            const container =
+                document.getElementById(
+                    "particles"
+                );
+
+            if (!container) return;
+
+            const colors = [
+                "rgba(96, 165, 250, 0.9)",   // blue
+                "rgba(192, 160, 250, 0.85)"  // purple
+            ];
+
+            for (let i = 0; i < count; i++) {
+
+                const particle =
+                    document.createElement(
+                        "div"
+                    );
+
+                particle.className =
+                    "particle";
+
+                const size =
+                    Math.random() * 3.5 + 2.5;
+
+                const left =
+                    Math.random() * 100;
+
+                const duration =
+                    Math.random() * 10 + 9;
+
+                // Start particles already mid-flight
+                // (negative delay) so they're visible
+                // immediately instead of after a long wait.
+                const delay =
+                    -(Math.random() * duration);
+
+                const drift =
+                    (Math.random() * 80 - 40) +
+                    "px";
+
+                const color =
+                    colors[
+                        Math.floor(
+                            Math.random() *
+                            colors.length
+                        )
+                    ];
+
+                const peakOpacity =
+                    (Math.random() * 0.3 + 0.6)
+                        .toFixed(2);
+
+                // Roughly 1 in 4 particles is a
+                // twinkling star instead of a dot.
+                const isStar =
+                    Math.random() < 0.25;
+
+                if (isStar) {
+
+                    particle.classList.add(
+                        "particle-star"
+                    );
+
+                    particle.textContent =
+                        "✦";
+
+                    const starSize =
+                        size * 6 + 6;
+
+                    particle.style.fontSize =
+                        `${starSize}px`;
+
+                    particle.style.color =
+                        color;
+
+                    // Small, tight shadow so the star's
+                    // points stay sharp instead of
+                    // blurring into a round blob.
+                    particle.style.textShadow =
+                        `0 0 6px ${color}`;
+
+                }
+
+                else {
+
+                    particle.style.width =
+                        `${size}px`;
+
+                    particle.style.height =
+                        `${size}px`;
+
+                    particle.style.background =
+                        color;
+
+                    particle.style.boxShadow =
+                        `0 0 ${size * 1.6}px ${color}`;
+
+                }
+
+                particle.style.left =
+                    `${left}%`;
+
+                particle.style.animationDuration =
+                    `${duration}s`;
+
+                particle.style.animationDelay =
+                    `${delay}s`;
+
+                particle.style.setProperty(
+                    "--drift",
+                    drift
+                );
+
+                particle.style.setProperty(
+                    "--peak-opacity",
+                    peakOpacity
+                );
+
+                container.appendChild(
+                    particle
+                );
+
+            }
+
+        }
 
 
         /* =================================================
@@ -1134,6 +1514,37 @@
         }
 
 
+        function playClickSound() {
+
+            playSound(
+                300,
+                0.045,
+                "triangle"
+            );
+
+        }
+
+
+        function playCoinSound() {
+
+            playSound(
+                988,
+                0.06,
+                "square"
+            );
+
+            setTimeout(
+                () => playSound(
+                    1319,
+                    0.09,
+                    "square"
+                ),
+                60
+            );
+
+        }
+
+
         function playLevelUpSound() {
 
             playSound(523, 0.1);
@@ -1157,8 +1568,427 @@
 
 
         /* =================================================
-           SCREEN NAVIGATION
+           BACKGROUND MUSIC
         ================================================== */
+
+        let musicPlaying = false;
+
+        let musicNodes = null;
+
+
+        function startBackgroundMusic() {
+
+            const ctx =
+                getAudioContext();
+
+            const now =
+                ctx.currentTime;
+
+
+            const masterGain =
+                ctx.createGain();
+
+            masterGain.gain.setValueAtTime(
+                0,
+                now
+            );
+
+            masterGain.gain.linearRampToValueAtTime(
+                0.14,
+                now + 2
+            );
+
+            masterGain.connect(
+                ctx.destination
+            );
+
+
+            // Soft ambient pad chord (C3, E3, G3)
+            // with slow drifting LFOs so it
+            // doesn't feel static or looped.
+
+            const notes =
+                [130.81, 164.81, 196.00];
+
+
+            const oscillators =
+                notes.map(
+                    (freq, index) => {
+
+                        const osc =
+                            ctx.createOscillator();
+
+                        osc.type = "sine";
+
+                        osc.frequency.value =
+                            freq;
+
+
+                        const oscGain =
+                            ctx.createGain();
+
+                        oscGain.gain.value =
+                            0.6;
+
+
+                        const lfo =
+                            ctx.createOscillator();
+
+                        lfo.frequency.value =
+                            0.05 + index * 0.02;
+
+
+                        const lfoGain =
+                            ctx.createGain();
+
+                        lfoGain.gain.value = 4;
+
+
+                        lfo.connect(lfoGain);
+
+                        lfoGain.connect(
+                            osc.frequency
+                        );
+
+                        lfo.start();
+
+
+                        osc.connect(oscGain);
+
+                        oscGain.connect(
+                            masterGain
+                        );
+
+                        osc.start();
+
+
+                        return { osc, lfo };
+
+                    }
+                );
+
+
+            musicNodes = {
+                masterGain,
+                oscillators
+            };
+
+            musicPlaying = true;
+
+        }
+
+
+        function stopBackgroundMusic() {
+
+            if (!musicNodes) return;
+
+
+            const ctx =
+                getAudioContext();
+
+            const now =
+                ctx.currentTime;
+
+
+            musicNodes.masterGain.gain
+                .linearRampToValueAtTime(
+                    0,
+                    now + 1
+                );
+
+
+            const nodesToStop =
+                musicNodes;
+
+
+            setTimeout(
+                () => {
+
+                    nodesToStop.oscillators.forEach(
+                        ({ osc, lfo }) => {
+
+                            osc.stop();
+
+                            lfo.stop();
+
+                        }
+                    );
+
+                },
+                1100
+            );
+
+
+            musicNodes = null;
+
+            musicPlaying = false;
+
+        }
+
+
+        function toggleMusic() {
+
+            const icon =
+                document.getElementById(
+                    "musicIcon"
+                );
+
+            const label =
+                document.getElementById(
+                    "musicLabel"
+                );
+
+
+            if (musicPlaying) {
+
+                stopBackgroundMusic();
+
+                icon.textContent = "🔇";
+
+                label.textContent = "Off";
+
+            }
+
+            else {
+
+                startBackgroundMusic();
+
+                icon.textContent = "🔊";
+
+                label.textContent = "On";
+
+            }
+
+        }
+
+
+        /* =================================================
+           VISUAL EFFECTS
+        ================================================== */
+
+        function flyCoinsToHUD() {
+
+            const origin =
+                document.getElementById(
+                    "result"
+                );
+
+            const target =
+                document.querySelector(
+                    ".hud-item.coins"
+                );
+
+            if (!origin || !target) return;
+
+
+            const originRect =
+                origin.getBoundingClientRect();
+
+            const targetRect =
+                target.getBoundingClientRect();
+
+
+            const startX =
+                originRect.left +
+                originRect.width / 2;
+
+            const startY =
+                originRect.top +
+                originRect.height / 2;
+
+            const endX =
+                targetRect.left +
+                targetRect.width / 2;
+
+            const endY =
+                targetRect.top +
+                targetRect.height / 2;
+
+
+            const coinCount = 6;
+
+
+            for (
+                let i = 0;
+                i < coinCount;
+                i++
+            ) {
+
+                const coin =
+                    document.createElement(
+                        "div"
+                    );
+
+                coin.className =
+                    "flying-coin";
+
+                coin.textContent = "🪙";
+
+
+                const jitterX =
+                    (Math.random() * 40 - 20);
+
+                const jitterY =
+                    (Math.random() * 30 - 15);
+
+
+                coin.style.left =
+                    `${startX + jitterX}px`;
+
+                coin.style.top =
+                    `${startY + jitterY}px`;
+
+                coin.style.setProperty(
+                    "--fly-x",
+                    `${endX - startX - jitterX}px`
+                );
+
+                coin.style.setProperty(
+                    "--fly-y",
+                    `${endY - startY - jitterY}px`
+                );
+
+                coin.style.animationDelay =
+                    `${i * 55}ms`;
+
+
+                document.body.appendChild(
+                    coin
+                );
+
+
+                setTimeout(
+                    () => coin.remove(),
+                    950 + i * 55
+                );
+
+            }
+
+
+            setTimeout(
+                () => {
+
+                    target.classList.remove(
+                        "coin-pulse"
+                    );
+
+                    void target.offsetWidth;
+
+                    target.classList.add(
+                        "coin-pulse"
+                    );
+
+                },
+                750
+            );
+
+        }
+
+
+        function spawnSparkleBurst() {
+
+            const origin =
+                document.getElementById(
+                    "result"
+                );
+
+            if (!origin) return;
+
+
+            const sparkleChars =
+                ["✦", "✧", "⭐"];
+
+
+            for (
+                let i = 0;
+                i < 8;
+                i++
+            ) {
+
+                const sparkle =
+                    document.createElement(
+                        "span"
+                    );
+
+                sparkle.className =
+                    "sparkle-burst";
+
+                sparkle.textContent =
+                    sparkleChars[
+                        Math.floor(
+                            Math.random() *
+                            sparkleChars.length
+                        )
+                    ];
+
+
+                const angle =
+                    (Math.PI * 2 * i) / 8;
+
+                const distance =
+                    60 + Math.random() * 30;
+
+
+                sparkle.style.setProperty(
+                    "--spark-x",
+                    `${
+                        Math.cos(angle) *
+                        distance
+                    }px`
+                );
+
+                sparkle.style.setProperty(
+                    "--spark-y",
+                    `${
+                        Math.sin(angle) *
+                        distance
+                    }px`
+                );
+
+                sparkle.style.color =
+                    Math.random() < 0.5
+                        ? "#60a5fa"
+                        : "#c4b5fd";
+
+
+                origin.appendChild(
+                    sparkle
+                );
+
+
+                setTimeout(
+                    () => sparkle.remove(),
+                    750
+                );
+
+            }
+
+        }
+
+
+        function flashUnlockedLevel(
+            levelNumber
+        ) {
+
+            const button =
+                document.querySelector(
+                    `.level-button[data-level="${levelNumber}"]`
+                );
+
+            if (!button) return;
+
+
+            button.classList.remove(
+                "unlock-animation"
+            );
+
+            void button.offsetWidth;
+
+            button.classList.add(
+                "unlock-animation"
+            );
+
+        }
 
         function showScreen(screenId) {
 
@@ -1210,10 +2040,14 @@
             }
 
 
-            playSound(
-                330,
-                0.05
-            );
+            playClickSound();
+
+
+            if (screenId === "leaderboardScreen") {
+
+                loadLeaderboard();
+
+            }
 
         }
 
@@ -1223,6 +2057,9 @@
         ================================================== */
 
         function selectLevel(levelNumber) {
+
+            playClickSound();
+
 
             if (
                 levelNumber >
@@ -1366,6 +2203,9 @@
             }
 
 
+            playClickSound();
+
+
             const input =
                 document.getElementById(
                     "guess"
@@ -1463,6 +2303,26 @@
             input.value = "";
 
 
+            const guessArea =
+                document.querySelector(
+                    ".guess-area"
+                );
+
+            if (guessArea) {
+
+                guessArea.classList.remove(
+                    "shake-animation"
+                );
+
+                void guessArea.offsetWidth;
+
+                guessArea.classList.add(
+                    "shake-animation"
+                );
+
+            }
+
+
             if (lives <= 0) {
 
                 handleGameOver();
@@ -1495,6 +2355,11 @@
 
             playCorrectSound();
 
+            setTimeout(
+                playCoinSound,
+                260
+            );
+
 
             document
                 .getElementById("result")
@@ -1521,6 +2386,9 @@
                 );
 
 
+            spawnSparkleBurst();
+
+
             /* =============================================
                COINS
             ============================================== */
@@ -1540,6 +2408,9 @@
 
             save.coins +=
                 coinReward;
+
+
+            flyCoinsToHUD();
 
 
             /* =============================================
@@ -1605,6 +2476,10 @@
                UNLOCK NEXT LEVEL
             ============================================== */
 
+            const previousUnlockedLevel =
+                save.unlockedLevel;
+
+
             if (
                 currentLevel <
                 8 &&
@@ -1643,6 +2518,21 @@
             updateUI();
 
             updateLevelButtons();
+
+
+            submitScoreToLeaderboard();
+
+
+            if (
+                save.unlockedLevel >
+                previousUnlockedLevel
+            ) {
+
+                flashUnlockedLevel(
+                    save.unlockedLevel
+                );
+
+            }
 
 
             document
@@ -1714,6 +2604,28 @@
                     `The number was ${secretNumber.toLocaleString()}.`;
 
 
+            const gamePanel =
+                document.querySelector(
+                    ".game-panel"
+                );
+
+            if (gamePanel) {
+
+                gamePanel.classList.remove(
+                    "shake-animation",
+                    "game-over-animation"
+                );
+
+                void gamePanel.offsetWidth;
+
+                gamePanel.classList.add(
+                    "shake-animation",
+                    "game-over-animation"
+                );
+
+            }
+
+
             showToast(
                 "💀",
                 "Better luck next time!"
@@ -1746,12 +2658,9 @@
 
         function restartLevel() {
 
-            startLevel();
+            playClickSound();
 
-            playSound(
-                330,
-                0.06
-            );
+            startLevel();
 
         }
 
@@ -1787,58 +2696,50 @@
 
         function updateUI() {
 
-            document
-                .getElementById("coins")
-                .textContent =
-                    save.coins.toLocaleString();
+            animateNumber(
+                "coins",
+                save.coins
+            );
 
+            animateNumber(
+                "xp",
+                save.xp
+            );
 
-            document
-                .getElementById("xp")
-                .textContent =
-                    save.xp.toLocaleString();
+            animateNumber(
+                "playerLevel",
+                save.playerLevel
+            );
 
+            animateNumber(
+                "shopCoins",
+                save.coins
+            );
 
-            document
-                .getElementById("playerLevel")
-                .textContent =
-                    save.playerLevel;
+            animateNumber(
+                "profileCoins",
+                save.coins
+            );
 
+            animateNumber(
+                "profileXP",
+                save.xp
+            );
 
-            document
-                .getElementById("shopCoins")
-                .textContent =
-                    save.coins.toLocaleString();
+            animateNumber(
+                "profileLevel",
+                save.playerLevel
+            );
 
+            animateNumber(
+                "totalWins",
+                save.totalWins
+            );
 
-            document
-                .getElementById("profileCoins")
-                .textContent =
-                    save.coins.toLocaleString();
-
-
-            document
-                .getElementById("profileXP")
-                .textContent =
-                    save.xp.toLocaleString();
-
-
-            document
-                .getElementById("profileLevel")
-                .textContent =
-                    save.playerLevel;
-
-
-            document
-                .getElementById("totalWins")
-                .textContent =
-                    save.totalWins;
-
-
-            document
-                .getElementById("bestStreak")
-                .textContent =
-                    save.bestStreak;
+            animateNumber(
+                "bestStreak",
+                save.bestStreak
+            );
 
 
             document
@@ -1866,6 +2767,105 @@
             updateShop();
 
             updateAchievements();
+
+        }
+
+
+        /* =================================================
+           ANIMATED NUMBER COUNT-UP
+        ================================================== */
+
+        function animateNumber(
+            elementId,
+            targetValue
+        ) {
+
+            const element =
+                document.getElementById(
+                    elementId
+                );
+
+            if (!element) return;
+
+
+            const startValue =
+                Number(
+                    element.dataset.value ||
+                    0
+                );
+
+
+            if (
+                startValue ===
+                targetValue
+            ) {
+
+                element.textContent =
+                    targetValue.toLocaleString();
+
+                element.dataset.value =
+                    targetValue;
+
+                return;
+
+            }
+
+
+            const duration = 450;
+
+            const startTime =
+                performance.now();
+
+
+            function tick(now) {
+
+                const progress =
+                    Math.min(
+                        (now - startTime) /
+                        duration,
+                        1
+                    );
+
+                // Ease-out for a natural
+                // deceleration into place.
+                const eased =
+                    1 - Math.pow(
+                        1 - progress,
+                        3
+                    );
+
+                const current =
+                    Math.round(
+                        startValue +
+                        (
+                            targetValue -
+                            startValue
+                        ) * eased
+                    );
+
+                element.textContent =
+                    current.toLocaleString();
+
+
+                if (progress < 1) {
+
+                    requestAnimationFrame(
+                        tick
+                    );
+
+                }
+
+                else {
+
+                    element.dataset.value =
+                        targetValue;
+
+                }
+
+            }
+
+
+            requestAnimationFrame(tick);
 
         }
 
@@ -1992,6 +2992,9 @@
 
         function buyItem(itemName) {
 
+            playClickSound();
+
+
             const item =
                 shopItems[itemName];
 
@@ -2048,6 +3051,33 @@
 
 
             playCorrectSound();
+
+
+            const purchasedButton =
+                document.getElementById(
+                    `${itemName}Button`
+                );
+
+            const shopItemCard =
+                purchasedButton
+                    ? purchasedButton.closest(
+                        ".shop-item"
+                    )
+                    : null;
+
+            if (shopItemCard) {
+
+                shopItemCard.classList.remove(
+                    "purchase-animation"
+                );
+
+                void shopItemCard.offsetWidth;
+
+                shopItemCard.classList.add(
+                    "purchase-animation"
+                );
+
+            }
 
 
             showToast(
@@ -2305,6 +3335,830 @@
                 achievementName
             );
 
+
+            const achievement =
+                achievementData[
+                    achievementName
+                ];
+
+
+            save.coins +=
+                achievement.reward;
+
+
+            saveGame();
+
+
+            setTimeout(
+                () => {
+
+                    showAchievement(
+                        achievement
+                    );
+
+                },
+                300
+            );
+
+
+            return true;
+
+        }
+
+
+        function updateAchievements() {
+
+            const map = {
+
+                firstStrike:
+                    "achievementFirstStrike",
+
+                coinHunter:
+                    "achievementCoinHunter",
+
+                levelThree:
+                    "achievementLevelThree",
+
+                levelFive:
+                    "achievementLevelFive",
+
+                levelEight:
+                    "achievementLevelEight",
+
+                streak:
+                    "achievementStreak"
+
+            };
+
+
+            Object.keys(map)
+                .forEach(name => {
+
+                    const element =
+                        document.getElementById(
+                            map[name]
+                        );
+
+
+                    if (
+                        save.achievements
+                            .includes(name)
+                    ) {
+
+                        element.classList.add(
+                            "unlocked-achievement"
+                        );
+
+                        element.classList.remove(
+                            "locked-achievement"
+                        );
+
+                    }
+
+                });
+
+        }
+
+
+        /* =================================================
+           LEVEL UP OVERLAY
+        ================================================== */
+
+        function showLevelUp(level) {
+
+            const overlay =
+                document.getElementById(
+                    "levelUpOverlay"
+                );
+
+
+            document
+                .getElementById(
+                    "newLevelNumber"
+                )
+                .textContent =
+                    `LEVEL ${level}`;
+
+
+            overlay.classList.remove(
+                "hidden"
+            );
+
+
+            playLevelUpSound();
+
+
+            clearTimeout(
+                levelUpTimer
+            );
+
+
+            levelUpTimer =
+                setTimeout(
+                    closeLevelUp,
+                    5000
+                );
+
+        }
+
+
+        function closeLevelUp() {
+
+            const overlay =
+                document.getElementById(
+                    "levelUpOverlay"
+                );
+
+
+            overlay.classList.add(
+                "hidden"
+            );
+
+
+            clearTimeout(
+                levelUpTimer
+            );
+
+        }
+
+
+        /* =================================================
+           ACHIEVEMENT OVERLAY
+        ================================================== */
+
+        function showAchievement(
+            achievement
+        ) {
+
+            const overlay =
+                document.getElementById(
+                    "achievementOverlay"
+                );
+
+
+            document
+                .getElementById(
+                    "achievementTitle"
+                )
+                .textContent =
+                    achievement.title;
+
+
+            document
+                .getElementById(
+                    "achievementDescription"
+                )
+                .textContent =
+                    achievement.description;
+
+
+            overlay
+                .querySelector(
+                    ".overlay-reward"
+                )
+                .textContent =
+                    `🪙 +${achievement.reward} COINS`;
+
+
+            overlay.classList.remove(
+                "hidden"
+            );
+
+
+            playLevelUpSound();
+
+
+            clearTimeout(
+                achievementTimer
+            );
+
+
+            achievementTimer =
+                setTimeout(
+                    closeAchievement,
+                    5000
+                );
+
+        }
+
+
+        function closeAchievement() {
+
+            const overlay =
+                document.getElementById(
+                    "achievementOverlay"
+                );
+
+
+            overlay.classList.add(
+                "hidden"
+            );
+
+
+            clearTimeout(
+                achievementTimer
+            );
+
+        }
+
+
+        /* =================================================
+           TOAST
+        ================================================== */
+
+        let toastTimer = null;
+
+
+        function showToast(
+            icon,
+            message
+        ) {
+
+            const toast =
+                document.getElementById(
+                    "toast"
+                );
+
+
+            document
+                .getElementById(
+                    "toastIcon"
+                )
+                .textContent =
+                    icon;
+
+
+            document
+                .getElementById(
+                    "toastMessage"
+                )
+                .textContent =
+                    message;
+
+
+            toast.classList.remove(
+                "hidden"
+            );
+
+
+            clearTimeout(
+                toastTimer
+            );
+
+
+            toastTimer =
+                setTimeout(
+                    () => {
+
+                        toast.classList.add(
+                            "hidden"
+                        );
+
+                    },
+                    2500
+                );
+
+        }
+
+
+        /* =================================================
+           LEADERBOARD — USERNAME
+        ================================================== */
+
+        function saveUsername() {
+
+            const input =
+                document.getElementById(
+                    "usernameInput"
+                );
+
+            const hint =
+                document.getElementById(
+                    "usernameHint"
+                );
+
+
+            const raw =
+                input.value.trim();
+
+
+            if (raw.length < 3) {
+
+                hint.textContent =
+                    "Username must be at least 3 characters.";
+
+                hint.classList.add(
+                    "hint-error"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                !/^[a-zA-Z0-9_ ]{3,20}$/.test(
+                    raw
+                )
+            ) {
+
+                hint.textContent =
+                    "Letters, numbers, spaces, and _ only.";
+
+                hint.classList.add(
+                    "hint-error"
+                );
+
+                return;
+
+            }
+
+
+            save.username = raw;
+
+            saveGame();
+
+            playClickSound();
+
+
+            renderUsernameCard();
+
+            submitScoreToLeaderboard();
+
+            loadLeaderboard();
+
+        }
+
+
+        function renderUsernameCard() {
+
+            const card =
+                document.getElementById(
+                    "usernameCard"
+                );
+
+            const hint =
+                document.getElementById(
+                    "usernameHint"
+                );
+
+            const youLabel =
+                document.getElementById(
+                    "leaderboardYou"
+                );
+
+            const input =
+                document.getElementById(
+                    "usernameInput"
+                );
+
+
+            if (save.username) {
+
+                input.value =
+                    save.username;
+
+                card.classList.add(
+                    "username-set"
+                );
+
+                hint.textContent =
+                    `Playing as ${save.username}. `;
+
+                hint.classList.remove(
+                    "hint-error"
+                );
+
+                youLabel.textContent =
+                    `👤 ${save.username}`;
+
+            }
+
+            else {
+
+                card.classList.remove(
+                    "username-set"
+                );
+
+                youLabel.textContent = "";
+
+            }
+
+        }
+
+
+        /* =================================================
+           LEADERBOARD — SUBMIT SCORE
+
+           NOTE: this client-side check only stops
+           accidental/obvious bad values from being sent.
+           The real protection is the Firestore Security
+           Rule, which re-checks these same numbers on
+           Google's servers — that's the part a player
+           can't bypass by editing this page's code.
+        ================================================== */
+
+        function submitScoreToLeaderboard() {
+
+            if (!firebaseReady) return;
+
+            if (!save.username) return;
+
+
+            // Sanity bound: no single win can award more
+            // than 800 coins (level 8 max reward, doubled
+            // by the Coin Boost upgrade). A total higher
+            // than totalWins * 800 is not achievable
+            // through normal play.
+
+            const maxPlausibleCoins =
+                Math.max(
+                    save.totalWins,
+                    1
+                ) * 800;
+
+
+            if (
+                save.coins <
+                0 ||
+                save.coins >
+                maxPlausibleCoins ||
+                !Number.isInteger(
+                    save.coins
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            firestoreDB
+                .collection("leaderboard")
+                .doc(save.username)
+                .set({
+
+                    username:
+                        save.username,
+
+                    coins:
+                        save.coins,
+
+                    playerLevel:
+                        save.playerLevel,
+
+                    totalWins:
+                        save.totalWins,
+
+                    achievementsCount:
+                        save.achievements.length,
+
+                    updatedAt:
+                        firebase.firestore
+                            .FieldValue
+                            .serverTimestamp()
+
+                })
+                .catch(
+                    error => {
+
+                        // Submission failing shouldn't
+                        // interrupt gameplay — the local
+                        // save is untouched either way.
+
+                    }
+                );
+
+        }
+
+
+        /* =================================================
+           LEADERBOARD — LOAD + RENDER
+        ================================================== */
+
+        let leaderboardLoading = false;
+
+
+        function setLeaderboardState(state) {
+
+            const states = [
+                "leaderboardLoading",
+                "leaderboardError",
+                "leaderboardEmpty"
+            ];
+
+
+            states.forEach(id => {
+
+                document
+                    .getElementById(id)
+                    .classList.add(
+                        "hidden"
+                    );
+
+            });
+
+
+            document
+                .getElementById(
+                    "leaderboardList"
+                )
+                .classList.add(
+                    "hidden"
+                );
+
+
+            if (state) {
+
+                document
+                    .getElementById(state)
+                    .classList.remove(
+                        "hidden"
+                    );
+
+            }
+
+            else {
+
+                document
+                    .getElementById(
+                        "leaderboardList"
+                    )
+                    .classList.remove(
+                        "hidden"
+                    );
+
+            }
+
+        }
+
+
+        function loadLeaderboard() {
+
+            if (leaderboardLoading) return;
+
+
+            const refreshButton =
+                document.getElementById(
+                    "refreshButton"
+                );
+
+
+            if (!firebaseReady) {
+
+                setLeaderboardState(
+                    "leaderboardError"
+                );
+
+                return;
+
+            }
+
+
+            leaderboardLoading = true;
+
+            refreshButton.disabled = true;
+
+            setLeaderboardState(
+                "leaderboardLoading"
+            );
+
+
+            firestoreDB
+                .collection("leaderboard")
+                .orderBy("coins", "desc")
+                .limit(50)
+                .get()
+                .then(snapshot => {
+
+                    const entries = [];
+
+
+                    snapshot.forEach(
+                        doc => {
+
+                            entries.push(
+                                doc.data()
+                            );
+
+                        }
+                    );
+
+
+                    renderLeaderboard(
+                        entries
+                    );
+
+                })
+                .catch(error => {
+
+                    setLeaderboardState(
+                        "leaderboardError"
+                    );
+
+                })
+                .finally(() => {
+
+                    leaderboardLoading =
+                        false;
+
+                    refreshButton.disabled =
+                        false;
+
+                });
+
+        }
+
+
+        function renderLeaderboard(entries) {
+
+            const list =
+                document.getElementById(
+                    "leaderboardList"
+                );
+
+
+            if (
+                !entries ||
+                entries.length === 0
+            ) {
+
+                setLeaderboardState(
+                    "leaderboardEmpty"
+                );
+
+                return;
+
+            }
+
+
+            list.innerHTML = "";
+
+
+            const medals =
+                ["🥇", "🥈", "🥉"];
+
+
+            entries.forEach(
+                (entry, index) => {
+
+                    const row =
+                        document.createElement(
+                            "div"
+                        );
+
+                    row.className =
+                        "leaderboard-row";
+
+
+                    if (index < 3) {
+
+                        row.classList.add(
+                            `rank-${index + 1}`
+                        );
+
+                    }
+
+
+                    if (
+                        entry.username ===
+                        save.username
+                    ) {
+
+                        row.classList.add(
+                            "leaderboard-you-row"
+                        );
+
+                    }
+
+
+                    const rankLabel =
+                        index < 3
+                            ? medals[index]
+                            : `#${index + 1}`;
+
+
+                    const safeName =
+                        document.createElement(
+                            "span"
+                        );
+
+                    safeName.className =
+                        "row-username";
+
+                    safeName.textContent =
+                        entry.username ||
+                        "???";
+
+
+                    row.innerHTML = `
+                        <span class="row-rank">${rankLabel}</span>
+                    `;
+
+                    row.appendChild(
+                        safeName
+                    );
+
+
+                    const stats =
+                        document.createElement(
+                            "span"
+                        );
+
+                    stats.className =
+                        "row-stats";
+
+                    stats.innerHTML = `
+                        <span class="row-coins">🪙 ${(entry.coins || 0).toLocaleString()}</span>
+                        <span class="row-level">⚡ Lv ${entry.playerLevel || 1}</span>
+                    `;
+
+                    row.appendChild(
+                        stats
+                    );
+
+
+                    list.appendChild(
+                        row
+                    );
+
+                }
+            );
+
+
+            setLeaderboardState(null);
+
+        }
+
+
+        /* =================================================
+           ENTER KEY
+        ================================================== */
+
+        document
+            .getElementById("guess")
+            .addEventListener(
+                "keydown",
+                function(event) {
+
+                    if (
+                        event.key ===
+                        "Enter"
+                    ) {
+
+                        checkGuess();
+
+                    }
+
+                }
+            );
+
+
+        /* =================================================
+           ESCAPE CLOSES OVERLAYS
+        ================================================== */
+
+        document.addEventListener(
+            "keydown",
+            function(event) {
+
+                if (
+                    event.key ===
+                    "Escape"
+                ) {
+
+                    closeLevelUp();
+
+                    closeAchievement();
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           INITIALIZE
+        ================================================== */
+
+        spawnParticles();
+
+        initFirebase();
+
+        renderUsernameCard();
+
+        updateUI();
+
+        updateLevelButtons();
+
+        startLevel();
+
+
+    </script>
+
+</body>
+
+</html>
 
             const achievement =
                 achievementData[
