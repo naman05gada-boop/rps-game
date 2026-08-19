@@ -3113,14 +3113,26 @@ button {
 
 
     .navigation {
+        display: grid;
+
+        grid-template-columns:
+            repeat(
+                2,
+                1fr
+            );
+
+        gap: 6px;
+
         margin-bottom: 14px;
     }
 
 
     .nav-button {
-        padding: 11px 7px;
+        max-width: none;
 
-        font-size: 12px;
+        padding: 12px 8px;
+
+        font-size: 13px;
     }
 
 
