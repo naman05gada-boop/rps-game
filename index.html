@@ -16,6 +16,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 </head>
 
 <body>
@@ -796,7 +797,7 @@
                             class="username-hint"
                             id="usernameHint"
                         >
-                            Set a username to appear on the leaderboard.
+                            Choose a username once. It will be locked to this player account.
                         </small>
 
                     </div>
@@ -1038,8 +1039,10 @@
 
 
         let firestoreDB = null;
-
+        let firebaseAuth = null;
         let firebaseReady = false;
+        let anonymousAuthReady = false;
+        let firebaseUid = null;
 
 
         function initFirebase() {
@@ -1067,7 +1070,29 @@
                 firestoreDB =
                     firebase.firestore();
 
+                firebaseAuth =
+                    firebase.auth();
+
                 firebaseReady = true;
+
+                // No email, no password, and no sign-up form.
+                // Firebase creates a private anonymous account for
+                // this browser so Firestore rules can require auth.
+                firebaseAuth
+                    .signInAnonymously()
+                    .then(() => {
+                        anonymousAuthReady = true;
+                        firebaseUid = firebaseAuth.currentUser?.uid || null;
+
+                        // Once authenticated, leaderboard reads/writes
+                        // are allowed to run.
+                        if (save.username) {
+                            submitScoreToLeaderboard();
+                        }
+                    })
+                    .catch(() => {
+                        anonymousAuthReady = false;
+                    });
 
             }
 
@@ -1236,92 +1261,13 @@
         }
 
 
-        let cloudSaveTimer = null;
-        let cloudSyncInProgress = false;
-
         function saveGame() {
+
             localStorage.setItem(
                 "guessNumberSave",
                 JSON.stringify(save)
             );
-            scheduleCloudSave();
-        }
 
-        function scheduleCloudSave() {
-            if (!firebaseReady || !save.username) return;
-            clearTimeout(cloudSaveTimer);
-            cloudSaveTimer = setTimeout(syncSaveToCloud, 500);
-        }
-
-        function getCloudSaveData() {
-            return {
-                coins: save.coins, xp: save.xp, playerLevel: save.playerLevel,
-                unlockedLevel: save.unlockedLevel, totalWins: save.totalWins,
-                bestStreak: save.bestStreak, currentStreak: save.currentStreak,
-                bestScores: save.bestScores, achievements: save.achievements,
-                username: save.username, items: save.items,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-        }
-
-        async function syncSaveToCloud() {
-            if (!firebaseReady || !save.username || cloudSyncInProgress) return;
-            cloudSyncInProgress = true;
-            try {
-                await firestoreDB.collection("players").doc(save.username).set(
-                    getCloudSaveData(), { merge: true }
-                );
-            } catch (error) {
-                // Local save remains available if the network is unavailable.
-            } finally {
-                cloudSyncInProgress = false;
-            }
-        }
-
-        async function loadCloudSave() {
-            if (!firebaseReady || !save.username) return false;
-            try {
-                const snapshot = await firestoreDB.collection("players")
-                    .doc(save.username).get();
-
-                if (!snapshot.exists) {
-                    await syncSaveToCloud();
-                    return false;
-                }
-
-                const cloud = snapshot.data() || {};
-                save.coins = Math.max(save.coins || 0, cloud.coins || 0);
-                save.xp = Math.max(save.xp || 0, cloud.xp || 0);
-                save.playerLevel = Math.max(save.playerLevel || 1, cloud.playerLevel || 1);
-                save.unlockedLevel = Math.max(save.unlockedLevel || 1, cloud.unlockedLevel || 1);
-                save.totalWins = Math.max(save.totalWins || 0, cloud.totalWins || 0);
-                save.bestStreak = Math.max(save.bestStreak || 0, cloud.bestStreak || 0);
-                save.currentStreak = Math.max(save.currentStreak || 0, cloud.currentStreak || 0);
-
-                const mergedScores = { ...(save.bestScores || {}) };
-                Object.keys(cloud.bestScores || {}).forEach(level => {
-                    const localScore = Number(mergedScores[level]);
-                    const cloudScore = Number(cloud.bestScores[level]);
-                    if (!Number.isFinite(localScore)) mergedScores[level] = cloudScore;
-                    else if (Number.isFinite(cloudScore)) mergedScores[level] = Math.min(localScore, cloudScore);
-                });
-                save.bestScores = mergedScores;
-
-                save.achievements = [...new Set([
-                    ...(save.achievements || []), ...(cloud.achievements || [])
-                ])];
-                save.items = { ...save.items, ...(cloud.items || {}) };
-
-                updatePlayerLevel();
-                localStorage.setItem("guessNumberSave", JSON.stringify(save));
-                updateUI();
-                updateLevelButtons();
-                renderUsernameCard();
-                await syncSaveToCloud();
-                return true;
-            } catch (error) {
-                return false;
-            }
         }
 
 
@@ -3716,60 +3662,48 @@
                     "usernameHint"
                 );
 
+            // Once a username has been attached to this anonymous
+            // Firebase account, it is locked to that account.
+            // This stops the old problem where changing the username
+            // created a new leaderboard document with the same score.
+            if (save.username) {
+                input.value = save.username;
+                hint.textContent =
+                    `Username locked as ${save.username}.`;
+                hint.classList.remove("hint-error");
+                renderUsernameCard();
+                return;
+            }
 
-            const raw =
-                input.value.trim();
-
+            const raw = input.value.trim();
 
             if (raw.length < 3) {
-
                 hint.textContent =
                     "Username must be at least 3 characters.";
-
-                hint.classList.add(
-                    "hint-error"
-                );
-
+                hint.classList.add("hint-error");
                 return;
-
             }
 
-
-            if (
-                !/^[a-zA-Z0-9_ ]{3,20}$/.test(
-                    raw
-                )
-            ) {
-
+            if (!/^[a-zA-Z0-9_ ]{3,20}$/.test(raw)) {
                 hint.textContent =
                     "Letters, numbers, spaces, and _ only.";
-
-                hint.classList.add(
-                    "hint-error"
-                );
-
+                hint.classList.add("hint-error");
                 return;
-
             }
 
+            if (!firebaseAuth || !firebaseAuth.currentUser) {
+                hint.textContent =
+                    "Connecting your player account... try again in a moment.";
+                hint.classList.add("hint-error");
+                return;
+            }
 
             save.username = raw;
-
-            localStorage.setItem(
-                "guessNumberSave",
-                JSON.stringify(save)
-            );
-
+            saveGame();
             playClickSound();
             renderUsernameCard();
-
-            // Pull cloud progress first, then submit the merged profile.
-            loadCloudSave().then(() => {
-                submitScoreToLeaderboard();
-                loadLeaderboard();
-                showToast("☁️", "Progress synced across devices!");
-            });
-
+            submitScoreToLeaderboard();
+            loadLeaderboard();
         }
 
 
@@ -3800,6 +3734,7 @@
 
                 input.value =
                     save.username;
+                input.disabled = true;
 
                 card.classList.add(
                     "username-set"
@@ -3819,6 +3754,7 @@
 
             else {
 
+                input.disabled = false;
                 card.classList.remove(
                     "username-set"
                 );
@@ -3833,20 +3769,26 @@
         /* =================================================
            LEADERBOARD — SUBMIT SCORE
 
-           NOTE: this client-side check only stops
-           accidental/obvious bad values from being sent.
-           The real protection is the Firestore Security
-           Rule, which re-checks these same numbers on
-           Google's servers — that's the part a player
-           can't bypass by editing this page's code.
+           NOTE: the UID now identifies the leaderboard account,
+           so changing the username no longer creates another
+           leaderboard identity. Client-side score values are still
+           not fully cheat-proof: a public browser game cannot make
+           client-calculated scores trustworthy by itself. Full score
+           protection requires server-side game validation (for example
+           a callable Cloud Function) plus Firestore Security Rules.
         ================================================== */
 
         function submitScoreToLeaderboard() {
 
             if (!firebaseReady) return;
 
+            if (!anonymousAuthReady) return;
+
             if (!save.username) return;
 
+            if (!firebaseAuth.currentUser) return;
+
+            const uid = firebaseAuth.currentUser.uid;
 
             // Sanity bound: no single win can award more
             // than 800 coins (level 8 max reward, doubled
@@ -3878,11 +3820,14 @@
 
             firestoreDB
                 .collection("leaderboard")
-                .doc(save.username)
+                .doc(uid)
                 .set({
 
                     username:
                         save.username,
+
+                    uid:
+                        uid,
 
                     coins:
                         save.coins,
@@ -3987,7 +3932,7 @@
                 );
 
 
-            if (!firebaseReady) {
+            if (!firebaseReady || !anonymousAuthReady) {
 
                 setLeaderboardState(
                     "leaderboardError"
@@ -4231,10 +4176,6 @@
         renderUsernameCard();
 
         updateUI();
-
-        if (save.username) {
-            loadCloudSave();
-        }
 
         updateLevelButtons();
 
