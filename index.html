@@ -17,9 +17,60 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+    <style>
+        .account-gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(3,7,18,.94);backdrop-filter:blur(14px)}
+        .account-gate.hidden{display:none}
+        .account-card{width:min(460px,100%);padding:34px;border:1px solid rgba(148,163,184,.25);border-radius:24px;background:rgba(15,23,42,.96);box-shadow:0 25px 80px rgba(0,0,0,.5);text-align:center}
+        .account-icon{font-size:52px;margin-bottom:10px}
+        .account-card h2{margin:8px 0;font-size:32px}
+        .account-card p{color:#aab6ca;line-height:1.5}
+        .game-id-box{margin:22px 0;padding:16px;border-radius:16px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25)}
+        .game-id-box small{display:block;color:#8fa4c4;letter-spacing:2px;margin-bottom:6px}
+        .game-id-box strong{font-size:28px;letter-spacing:5px;color:#fff}
+        #accountGate input{width:100%;box-sizing:border-box;margin:10px 0;padding:14px 16px;border-radius:12px;border:1px solid rgba(148,163,184,.3);background:#0b1220;color:#fff;font-size:16px;outline:none}
+        .account-button{width:100%;margin-top:8px}
+        .account-link{width:100%;margin-top:10px}
+        .account-status{min-height:22px;font-weight:600}
+        .account-safety{display:block;margin-top:16px;color:#71809a;line-height:1.4}
+    </style>
 </head>
 
 <body>
+
+    <!-- =====================================================
+         GAME ACCOUNT GATE
+         Anonymous Firebase auth + local Game ID.
+         No email or password is collected.
+    ====================================================== -->
+    <div id="accountGate" class="account-gate">
+        <div class="account-card">
+            <div class="account-icon">🎮</div>
+            <span class="eyebrow">PLAYER ACCESS</span>
+            <h2>Enter Your Game</h2>
+            <p id="accountGateText">Your Game ID keeps this browser's game profile separate from other players.</p>
+
+            <div id="newAccountArea">
+                <div class="game-id-box">
+                    <small>YOUR GAME ID</small>
+                    <strong id="newGameId">------</strong>
+                </div>
+                <input id="firstUsernameInput" type="text" maxlength="20" placeholder="Choose your username" autocomplete="off">
+                <button class="primary-button account-button" onclick="createLocalGameAccount()">CREATE &amp; ENTER GAME</button>
+                <button class="secondary-button account-link" onclick="showExistingAccount()">I ALREADY HAVE A GAME ID</button>
+            </div>
+
+            <div id="existingAccountArea" class="hidden">
+                <input id="gameIdInput" type="text" maxlength="8" placeholder="Enter your Game ID" autocomplete="off" spellcheck="false">
+                <button class="primary-button account-button" onclick="loginWithGameId()">ENTER GAME</button>
+                <button class="secondary-button account-link" onclick="showNewAccount()">CREATE A NEW GAME ID</button>
+            </div>
+
+            <p id="accountGateStatus" class="account-status"></p>
+            <small class="account-safety">No email or password is used. Your Game ID is a player identifier, not a password. For real cross-device account recovery, a server-side sign-in system would be needed.</small>
+        </div>
+    </div>
+
 
     <!-- =====================================================
          BACKGROUND ATMOSPHERE
@@ -788,7 +839,7 @@
                                 class="primary-button"
                                 onclick="saveUsername()"
                             >
-                                SAVE
+                                UPDATE NAME
                             </button>
 
                         </div>
@@ -797,7 +848,7 @@
                             class="username-hint"
                             id="usernameHint"
                         >
-                            Choose a username once. It will be locked to this player account.
+                            Change your display name anytime. Your Game ID keeps the same player account.
                         </small>
 
                     </div>
@@ -1195,6 +1246,7 @@
             achievements: [],
 
             username: "",
+            gameId: "",
 
             items: {
 
@@ -2016,6 +2068,8 @@
         }
 
         function showScreen(screenId) {
+
+            if (!accountGateUnlocked) return;
 
             document
                 .querySelectorAll(".screen")
@@ -3652,48 +3706,24 @@
 
         function saveUsername() {
 
-            const input =
-                document.getElementById(
-                    "usernameInput"
-                );
-
-            const hint =
-                document.getElementById(
-                    "usernameHint"
-                );
-
-            // Once a username has been attached to this anonymous
-            // Firebase account, it is locked to that account.
-            // This stops the old problem where changing the username
-            // created a new leaderboard document with the same score.
-            if (save.username) {
-                input.value = save.username;
-                hint.textContent =
-                    `Username locked as ${save.username}.`;
-                hint.classList.remove("hint-error");
-                renderUsernameCard();
-                return;
-            }
-
+            const input = document.getElementById("usernameInput");
+            const hint = document.getElementById("usernameHint");
             const raw = input.value.trim();
 
             if (raw.length < 3) {
-                hint.textContent =
-                    "Username must be at least 3 characters.";
+                hint.textContent = "Username must be at least 3 characters.";
                 hint.classList.add("hint-error");
                 return;
             }
 
             if (!/^[a-zA-Z0-9_ ]{3,20}$/.test(raw)) {
-                hint.textContent =
-                    "Letters, numbers, spaces, and _ only.";
+                hint.textContent = "Letters, numbers, spaces, and _ only.";
                 hint.classList.add("hint-error");
                 return;
             }
 
-            if (!firebaseAuth || !firebaseAuth.currentUser) {
-                hint.textContent =
-                    "Connecting your player account... try again in a moment.";
+            if (!firebaseAuth || !firebaseAuth.currentUser || !anonymousAuthReady) {
+                hint.textContent = "Connecting your player account... try again in a moment.";
                 hint.classList.add("hint-error");
                 return;
             }
@@ -3704,65 +3734,31 @@
             renderUsernameCard();
             submitScoreToLeaderboard();
             loadLeaderboard();
+            showToast("✏️", `Username changed to ${raw}`);
         }
 
 
         function renderUsernameCard() {
 
-            const card =
-                document.getElementById(
-                    "usernameCard"
-                );
-
-            const hint =
-                document.getElementById(
-                    "usernameHint"
-                );
-
-            const youLabel =
-                document.getElementById(
-                    "leaderboardYou"
-                );
-
-            const input =
-                document.getElementById(
-                    "usernameInput"
-                );
-
+            const card = document.getElementById("usernameCard");
+            const hint = document.getElementById("usernameHint");
+            const youLabel = document.getElementById("leaderboardYou");
+            const input = document.getElementById("usernameInput");
+            const profileGameId = document.getElementById("profileGameId");
+            if (profileGameId) profileGameId.textContent = save.gameId || "------";
 
             if (save.username) {
-
-                input.value =
-                    save.username;
-                input.disabled = true;
-
-                card.classList.add(
-                    "username-set"
-                );
-
-                hint.textContent =
-                    `Playing as ${save.username}. `;
-
-                hint.classList.remove(
-                    "hint-error"
-                );
-
-                youLabel.textContent =
-                    `👤 ${save.username}`;
-
-            }
-
-            else {
-
+                input.value = save.username;
                 input.disabled = false;
-                card.classList.remove(
-                    "username-set"
-                );
-
+                card.classList.add("username-set");
+                hint.textContent = "You can change your display name anytime. Your Game ID stays the same.";
+                hint.classList.remove("hint-error");
+                youLabel.textContent = `👤 ${save.username}`;
+            } else {
+                input.disabled = false;
+                card.classList.remove("username-set");
                 youLabel.textContent = "";
-
             }
-
         }
 
 
@@ -4165,12 +4161,133 @@
         );
 
 
+        function copyGameId() {
+            if (!save.gameId) return;
+            navigator.clipboard?.writeText(save.gameId)
+                .then(() => showToast("📋", "Game ID copied!"))
+                .catch(() => showToast("🆔", `Game ID: ${save.gameId}`));
+        }
+
+
+        /* =================================================
+           GAME ID ACCOUNT GATE
+
+           Important: this is a local Game ID system. Firebase
+           anonymous auth protects Firestore access, while the
+           Game ID keeps profiles separated on this browser.
+           A Game ID alone is NOT a password and is not a secure
+           cross-device login credential.
+        ================================================== */
+
+        let accountGateUnlocked = false;
+
+        function generateGameId() {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let id = "";
+            for (let i = 0; i < 8; i++) {
+                id += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return id;
+        }
+
+        function setAccountStatus(message, error = false) {
+            const el = document.getElementById("accountGateStatus");
+            el.textContent = message || "";
+            el.style.color = error ? "#fb7185" : "#94a3b8";
+        }
+
+        function showNewAccount() {
+            document.getElementById("newAccountArea").classList.remove("hidden");
+            document.getElementById("existingAccountArea").classList.add("hidden");
+            setAccountStatus("");
+        }
+
+        function showExistingAccount() {
+            document.getElementById("newAccountArea").classList.add("hidden");
+            document.getElementById("existingAccountArea").classList.remove("hidden");
+            setAccountStatus("");
+            setTimeout(() => document.getElementById("gameIdInput").focus(), 50);
+        }
+
+        function createLocalGameAccount() {
+            if (!anonymousAuthReady || !firebaseAuth.currentUser) {
+                setAccountStatus("Still connecting to Firebase. Try again in a moment.", true);
+                return;
+            }
+
+            const username = document.getElementById("firstUsernameInput").value.trim();
+
+            if (!/^[a-zA-Z0-9_ ]{3,20}$/.test(username)) {
+                setAccountStatus("Choose a username with 3–20 letters, numbers, spaces, or _.", true);
+                return;
+            }
+
+            const gameId = document.getElementById("newGameId").textContent.trim();
+            save.gameId = gameId;
+            save.username = username;
+            saveGame();
+
+            document.getElementById("newGameId").textContent = gameId;
+            unlockAccountGate();
+            showToast("🆔", `Your Game ID is ${gameId} — save it!`);
+            submitScoreToLeaderboard();
+            renderUsernameCard();
+        }
+
+        function loginWithGameId() {
+            if (!anonymousAuthReady || !firebaseAuth.currentUser) {
+                setAccountStatus("Still connecting to Firebase. Try again in a moment.", true);
+                return;
+            }
+
+            const entered = document.getElementById("gameIdInput").value.trim().toUpperCase();
+            const savedId = (save.gameId || "").toUpperCase();
+
+            // Safety: this local login only accepts the Game ID that belongs
+            // to this browser's existing local profile. It never lets a user
+            // type another player's ID and take over their profile.
+            if (!savedId || entered !== savedId) {
+                setAccountStatus("That Game ID doesn't belong to this browser profile.", true);
+                return;
+            }
+
+            unlockAccountGate();
+            renderUsernameCard();
+        }
+
+        function unlockAccountGate() {
+            if (!anonymousAuthReady) {
+                setAccountStatus("Firebase authentication is not ready yet.", true);
+                return;
+            }
+
+            accountGateUnlocked = true;
+            document.getElementById("accountGate").classList.add("hidden");
+            updateUI();
+            updateLevelButtons();
+            startLevel();
+        }
+
+        function prepareAccountGate() {
+            const newId = document.getElementById("newGameId");
+            newId.textContent = generateGameId();
+
+            if (save.gameId && save.username) {
+                document.getElementById("newAccountArea").classList.add("hidden");
+                document.getElementById("existingAccountArea").classList.remove("hidden");
+                document.getElementById("gameIdInput").value = save.gameId;
+                document.getElementById("accountGateText").textContent = `Welcome back, ${save.username}. Enter your Game ID to continue.`;
+            }
+        }
+
+
         /* =================================================
            INITIALIZE
         ================================================== */
 
         spawnParticles();
 
+        prepareAccountGate();
         initFirebase();
 
         renderUsernameCard();
@@ -4178,8 +4295,6 @@
         updateUI();
 
         updateLevelButtons();
-
-        startLevel();
 
 
     </script>
