@@ -1236,13 +1236,92 @@
         }
 
 
-        function saveGame() {
+        let cloudSaveTimer = null;
+        let cloudSyncInProgress = false;
 
+        function saveGame() {
             localStorage.setItem(
                 "guessNumberSave",
                 JSON.stringify(save)
             );
+            scheduleCloudSave();
+        }
 
+        function scheduleCloudSave() {
+            if (!firebaseReady || !save.username) return;
+            clearTimeout(cloudSaveTimer);
+            cloudSaveTimer = setTimeout(syncSaveToCloud, 500);
+        }
+
+        function getCloudSaveData() {
+            return {
+                coins: save.coins, xp: save.xp, playerLevel: save.playerLevel,
+                unlockedLevel: save.unlockedLevel, totalWins: save.totalWins,
+                bestStreak: save.bestStreak, currentStreak: save.currentStreak,
+                bestScores: save.bestScores, achievements: save.achievements,
+                username: save.username, items: save.items,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+        }
+
+        async function syncSaveToCloud() {
+            if (!firebaseReady || !save.username || cloudSyncInProgress) return;
+            cloudSyncInProgress = true;
+            try {
+                await firestoreDB.collection("players").doc(save.username).set(
+                    getCloudSaveData(), { merge: true }
+                );
+            } catch (error) {
+                // Local save remains available if the network is unavailable.
+            } finally {
+                cloudSyncInProgress = false;
+            }
+        }
+
+        async function loadCloudSave() {
+            if (!firebaseReady || !save.username) return false;
+            try {
+                const snapshot = await firestoreDB.collection("players")
+                    .doc(save.username).get();
+
+                if (!snapshot.exists) {
+                    await syncSaveToCloud();
+                    return false;
+                }
+
+                const cloud = snapshot.data() || {};
+                save.coins = Math.max(save.coins || 0, cloud.coins || 0);
+                save.xp = Math.max(save.xp || 0, cloud.xp || 0);
+                save.playerLevel = Math.max(save.playerLevel || 1, cloud.playerLevel || 1);
+                save.unlockedLevel = Math.max(save.unlockedLevel || 1, cloud.unlockedLevel || 1);
+                save.totalWins = Math.max(save.totalWins || 0, cloud.totalWins || 0);
+                save.bestStreak = Math.max(save.bestStreak || 0, cloud.bestStreak || 0);
+                save.currentStreak = Math.max(save.currentStreak || 0, cloud.currentStreak || 0);
+
+                const mergedScores = { ...(save.bestScores || {}) };
+                Object.keys(cloud.bestScores || {}).forEach(level => {
+                    const localScore = Number(mergedScores[level]);
+                    const cloudScore = Number(cloud.bestScores[level]);
+                    if (!Number.isFinite(localScore)) mergedScores[level] = cloudScore;
+                    else if (Number.isFinite(cloudScore)) mergedScores[level] = Math.min(localScore, cloudScore);
+                });
+                save.bestScores = mergedScores;
+
+                save.achievements = [...new Set([
+                    ...(save.achievements || []), ...(cloud.achievements || [])
+                ])];
+                save.items = { ...save.items, ...(cloud.items || {}) };
+
+                updatePlayerLevel();
+                localStorage.setItem("guessNumberSave", JSON.stringify(save));
+                updateUI();
+                updateLevelButtons();
+                renderUsernameCard();
+                await syncSaveToCloud();
+                return true;
+            } catch (error) {
+                return false;
+            }
         }
 
 
@@ -3676,16 +3755,20 @@
 
             save.username = raw;
 
-            saveGame();
+            localStorage.setItem(
+                "guessNumberSave",
+                JSON.stringify(save)
+            );
 
             playClickSound();
-
-
             renderUsernameCard();
 
-            submitScoreToLeaderboard();
-
-            loadLeaderboard();
+            // Pull cloud progress first, then submit the merged profile.
+            loadCloudSave().then(() => {
+                submitScoreToLeaderboard();
+                loadLeaderboard();
+                showToast("☁️", "Progress synced across devices!");
+            });
 
         }
 
@@ -4148,6 +4231,10 @@
         renderUsernameCard();
 
         updateUI();
+
+        if (save.username) {
+            loadCloudSave();
+        }
 
         updateLevelButtons();
 
