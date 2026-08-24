@@ -10,8 +10,7 @@
     <link rel="stylesheet" href="style.css">
 
     <!-- =====================================================
-         FIREBASE (for the online leaderboard)
-         Loaded from Google's CDN — no build step needed.
+         FIREBASE
     ====================================================== -->
 
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -27,19 +26,32 @@
             position: relative;
             z-index: 10;
         }
+
         .auth-card {
             width: min(520px, 100%);
             padding: 34px;
             border-radius: 24px;
             border: 1px solid rgba(120, 170, 255, 0.25);
-            background: rgba(10, 16, 35, 0.88);
-            backdrop-filter: blur(18px);
+            background: rgba(10, 16, 35, 0.94);
             box-shadow: 0 25px 80px rgba(0,0,0,.45);
             text-align: center;
         }
-        .auth-card h1 { margin: 8px 0 10px; }
-        .auth-card p { opacity: .78; line-height: 1.6; }
-        .auth-form { display: grid; gap: 12px; margin-top: 22px; }
+
+        .auth-card h1 {
+            margin: 8px 0 10px;
+        }
+
+        .auth-card p {
+            opacity: .78;
+            line-height: 1.6;
+        }
+
+        .auth-form {
+            display: grid;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
         .auth-form input {
             width: 100%;
             box-sizing: border-box;
@@ -50,9 +62,23 @@
             color: inherit;
             outline: none;
         }
-        .auth-form input:focus { border-color: rgba(100,170,255,.8); }
-        .auth-actions { display: grid; gap: 10px; margin-top: 16px; }
-        .auth-status { min-height: 24px; margin-top: 14px; font-size: .92rem; }
+
+        .auth-form input:focus {
+            border-color: rgba(100,170,255,.8);
+        }
+
+        .auth-actions {
+            display: grid;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .auth-status {
+            min-height: 24px;
+            margin-top: 14px;
+            font-size: .92rem;
+        }
+
         .auth-success {
             margin-top: 18px;
             padding: 18px;
@@ -60,6 +86,7 @@
             background: rgba(40, 180, 120, .09);
             border: 1px solid rgba(80, 220, 150, .25);
         }
+
         .credential-box {
             margin: 10px 0;
             padding: 12px;
@@ -68,11 +95,33 @@
             text-align: left;
             word-break: break-word;
         }
-        .credential-box strong { display:block; margin-bottom: 4px; opacity:.7; font-size:.8rem; }
-        .credential-value { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1.05rem; letter-spacing: .08em; }
-        .auth-note { font-size: .8rem; opacity: .6; margin-top: 14px; }
-        .hidden-auth { display:none !important; }
-        .auth-locked { display:none !important; }
+
+        .credential-box strong {
+            display: block;
+            margin-bottom: 4px;
+            opacity: .7;
+            font-size: .8rem;
+        }
+
+        .credential-value {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 1.05rem;
+            letter-spacing: .08em;
+        }
+
+        .auth-note {
+            font-size: .8rem;
+            opacity: .6;
+            margin-top: 14px;
+        }
+
+        .hidden-auth {
+            display: none !important;
+        }
+
+        .auth-locked {
+            display: none !important;
+        }
     </style>
 
 </head>
@@ -92,74 +141,196 @@
     </div>
 
 
-
     <!-- =====================================================
          ACCOUNT / CROSS-DEVICE LOGIN
     ====================================================== -->
+
     <section id="authScreen" class="auth-screen">
+
         <div class="auth-card">
+
             <div class="brand-icon">🎮</div>
+
             <span class="eyebrow">PLAYER ACCOUNT</span>
+
             <h1>Welcome back.</h1>
-            <p>Use your Game ID and Recovery Code to load your progress on any device.</p>
+
+            <p>
+                Use your Game ID and Recovery Code to load your
+                progress on any device.
+            </p>
+
 
             <div id="loginPanel">
+
                 <div class="auth-form">
-                    <input id="loginGameId" type="text" maxlength="12" placeholder="Game ID" autocomplete="off" spellcheck="false">
-                    <input id="loginRecoveryCode" type="text" maxlength="16" placeholder="Recovery Code" autocomplete="off" spellcheck="false">
+
+                    <input
+                        id="loginGameId"
+                        type="text"
+                        maxlength="12"
+                        placeholder="Game ID"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+
+                    <input
+                        id="loginRecoveryCode"
+                        type="text"
+                        maxlength="16"
+                        placeholder="Recovery Code"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+
                 </div>
+
+
                 <div class="auth-actions">
-                    <button class="primary-button" onclick="loginAccount()">🔐 LOAD MY ACCOUNT</button>
-                    <button class="secondary-button" onclick="showCreatePanel()">✨ CREATE NEW GAME ID</button>
+
+                    <button
+                        class="primary-button"
+                        onclick="loginAccount()"
+                    >
+                        🔐 LOAD MY ACCOUNT
+                    </button>
+
+                    <button
+                        class="secondary-button"
+                        onclick="showCreatePanel()"
+                    >
+                        ✨ CREATE NEW GAME ID
+                    </button>
+
                 </div>
-                <div id="loginStatus" class="auth-status"></div>
+
+
+                <div
+                    id="loginStatus"
+                    class="auth-status"
+                ></div>
+
             </div>
 
-            <div id="createPanel" class="hidden-auth">
-                <p>We'll create a unique Game ID and a strong Recovery Code. <b>Save both.</b></p>
+
+            <div
+                id="createPanel"
+                class="hidden-auth"
+            >
+
+                <p>
+                    We'll create a unique Game ID and a strong
+                    Recovery Code. <b>Save both.</b>
+                </p>
+
                 <div class="auth-actions">
-                    <button class="primary-button" onclick="createAccount()">🚀 CREATE ACCOUNT</button>
-                    <button class="secondary-button" onclick="showLoginPanel()">← I ALREADY HAVE ONE</button>
+
+                    <button
+                        class="primary-button"
+                        onclick="createAccount()"
+                    >
+                        🚀 CREATE ACCOUNT
+                    </button>
+
+                    <button
+                        class="secondary-button"
+                        onclick="showLoginPanel()"
+                    >
+                        ← I ALREADY HAVE ONE
+                    </button>
+
                 </div>
-                <div id="createStatus" class="auth-status"></div>
+
+                <div
+                    id="createStatus"
+                    class="auth-status"
+                ></div>
+
             </div>
 
-            <div id="createdPanel" class="auth-success hidden-auth">
+
+            <div
+                id="createdPanel"
+                class="auth-success hidden-auth"
+            >
+
                 <h2>Account created! 🔥</h2>
-                <p>Save these before continuing. They are what you use to move your account to another device.</p>
+
+                <p>
+                    Save these before continuing. They are what
+                    you use to move your account to another device.
+                </p>
+
+
                 <div class="credential-box">
+
                     <strong>GAME ID</strong>
-                    <div id="createdGameId" class="credential-value"></div>
+
+                    <div
+                        id="createdGameId"
+                        class="credential-value"
+                    ></div>
+
                 </div>
+
+
                 <div class="credential-box">
+
                     <strong>RECOVERY CODE</strong>
-                    <div id="createdRecoveryCode" class="credential-value"></div>
+
+                    <div
+                        id="createdRecoveryCode"
+                        class="credential-value"
+                    ></div>
+
                 </div>
-                <button class="primary-button" onclick="enterGame()">🎮 ENTER GAME</button>
-                <div class="auth-note">If you lose the Recovery Code, there is no email reset because this game does not use personal email.</div>
+
+
+                <button
+                    class="primary-button"
+                    onclick="enterGame()"
+                >
+                    🎮 ENTER GAME
+                </button>
+
+                <div class="auth-note">
+                    If you lose the Recovery Code, there is no
+                    email reset because this game does not use
+                    personal email.
+                </div>
+
             </div>
+
         </div>
+
     </section>
+
 
     <!-- =====================================================
          MAIN APP
     ====================================================== -->
 
-    <main class="app auth-locked" id="gameApp">
+    <main
+        class="app auth-locked"
+        id="gameApp"
+    >
 
-        <!-- =================================================
-             HEADER
-        ================================================== -->
+        <!-- HEADER -->
 
         <header class="header">
 
             <div class="brand">
+
                 <div class="brand-icon">🎮</div>
 
                 <div>
                     <h1>Guess the Number</h1>
-                    <p>Outsmart the number. Build your streak. Become the legend.</p>
+                    <p>
+                        Outsmart the number. Build your streak.
+                        Become the legend.
+                    </p>
                 </div>
+
             </div>
 
 
@@ -168,28 +339,40 @@
             <div class="hud">
 
                 <div class="hud-item coins">
+
                     <span>🪙</span>
+
                     <div>
                         <small>Coins</small>
                         <strong id="coins">0</strong>
                     </div>
+
                 </div>
 
+
                 <div class="hud-item xp">
+
                     <span>⭐</span>
+
                     <div>
                         <small>XP</small>
                         <strong id="xp">0</strong>
                     </div>
+
                 </div>
 
+
                 <div class="hud-item level">
+
                     <span>⚡</span>
+
                     <div>
                         <small>Level</small>
                         <strong id="playerLevel">1</strong>
                     </div>
+
                 </div>
+
 
                 <button
                     class="hud-item music-toggle"
@@ -197,11 +380,14 @@
                     onclick="toggleMusic()"
                     aria-label="Toggle background music"
                 >
+
                     <span id="musicIcon">🔇</span>
+
                     <div>
                         <small>Music</small>
                         <strong id="musicLabel">Off</strong>
                     </div>
+
                 </button>
 
             </div>
@@ -209,9 +395,7 @@
         </header>
 
 
-        <!-- =================================================
-             NAVIGATION
-        ================================================== -->
+        <!-- NAVIGATION -->
 
         <nav class="navigation">
 
@@ -250,50 +434,57 @@
         </nav>
 
 
-        <!-- =================================================
+        <!-- =====================================================
              SCREENS
-        ================================================== -->
+        ====================================================== -->
 
         <section class="screens">
 
 
-            <!-- =================================================
-                 GAME SCREEN
-            ================================================== -->
+            <!-- GAME SCREEN -->
 
             <section
                 id="gameScreen"
                 class="screen active-screen"
             >
 
-                <!-- GAME PANEL -->
-
                 <div class="panel game-panel">
 
                     <div class="game-status">
 
                         <div class="status-item">
+
                             <span>❤️</span>
+
                             <div>
                                 <small>Lives</small>
                                 <strong id="lives">5</strong>
                             </div>
+
                         </div>
 
+
                         <div class="status-item">
+
                             <span>🔢</span>
+
                             <div>
                                 <small>Attempts</small>
                                 <strong id="attempts">0</strong>
                             </div>
+
                         </div>
 
+
                         <div class="status-item">
+
                             <span>🏆</span>
+
                             <div>
                                 <small>Best</small>
                                 <strong id="bestScore">---</strong>
                             </div>
+
                         </div>
 
                     </div>
@@ -301,7 +492,9 @@
 
                     <div class="game-content">
 
-                        <span class="eyebrow">CURRENT MISSION</span>
+                        <span class="eyebrow">
+                            CURRENT MISSION
+                        </span>
 
                         <h2 id="gameTitle">
                             Guess the Number
@@ -311,8 +504,6 @@
                             Choose a level to begin!
                         </p>
 
-
-                        <!-- GUESS AREA -->
 
                         <div class="guess-area">
 
@@ -343,8 +534,6 @@
                         ></div>
 
 
-                        <!-- RESTART -->
-
                         <button
                             id="restartButton"
                             class="secondary-button"
@@ -365,11 +554,19 @@
                     <div class="panel-heading">
 
                         <div>
-                            <span class="eyebrow">PROGRESSION</span>
+
+                            <span class="eyebrow">
+                                PROGRESSION
+                            </span>
+
                             <h2>Choose Your Level</h2>
+
                         </div>
 
-                        <span class="level-counter" id="levelCounter">
+                        <span
+                            class="level-counter"
+                            id="levelCounter"
+                        >
                             1 / 8
                         </span>
 
@@ -480,9 +677,7 @@
             </section>
 
 
-            <!-- =================================================
-                 SHOP SCREEN
-            ================================================== -->
+            <!-- SHOP -->
 
             <section
                 id="shopScreen"
@@ -493,7 +688,9 @@
 
                     <div class="screen-heading">
 
-                        <span class="eyebrow">UPGRADES</span>
+                        <span class="eyebrow">
+                            UPGRADES
+                        </span>
 
                         <h2>🛒 The Shop</h2>
 
@@ -511,9 +708,6 @@
 
                     <div class="shop-grid">
 
-
-                        <!-- DOUBLE COINS -->
-
                         <article class="shop-item">
 
                             <div class="shop-icon">💰</div>
@@ -526,7 +720,10 @@
                                     Earn extra coins when you win.
                                 </p>
 
-                                <span class="item-status" id="coinBoostStatus">
+                                <span
+                                    class="item-status"
+                                    id="coinBoostStatus"
+                                >
                                     Locked
                                 </span>
 
@@ -543,8 +740,6 @@
                         </article>
 
 
-                        <!-- EXTRA LIFE -->
-
                         <article class="shop-item">
 
                             <div class="shop-icon">❤️</div>
@@ -557,7 +752,10 @@
                                     Start levels with one additional life.
                                 </p>
 
-                                <span class="item-status" id="extraLifeStatus">
+                                <span
+                                    class="item-status"
+                                    id="extraLifeStatus"
+                                >
                                     Locked
                                 </span>
 
@@ -574,8 +772,6 @@
                         </article>
 
 
-                        <!-- LUCKY NUMBER -->
-
                         <article class="shop-item">
 
                             <div class="shop-icon">🍀</div>
@@ -588,7 +784,10 @@
                                     Unlock a special number bonus.
                                 </p>
 
-                                <span class="item-status" id="luckyNumberStatus">
+                                <span
+                                    class="item-status"
+                                    id="luckyNumberStatus"
+                                >
                                     Locked
                                 </span>
 
@@ -605,8 +804,6 @@
                         </article>
 
 
-                        <!-- XP BOOST -->
-
                         <article class="shop-item">
 
                             <div class="shop-icon">⭐</div>
@@ -619,7 +816,10 @@
                                     Gain extra XP from successful rounds.
                                 </p>
 
-                                <span class="item-status" id="xpBoostStatus">
+                                <span
+                                    class="item-status"
+                                    id="xpBoostStatus"
+                                >
                                     Locked
                                 </span>
 
@@ -642,9 +842,7 @@
             </section>
 
 
-            <!-- =================================================
-                 PROFILE SCREEN
-            ================================================== -->
+            <!-- PROFILE -->
 
             <section
                 id="profileScreen"
@@ -655,7 +853,9 @@
 
                     <div class="screen-heading">
 
-                        <span class="eyebrow">PLAYER DATA</span>
+                        <span class="eyebrow">
+                            PLAYER DATA
+                        </span>
 
                         <h2>🏆 Profile</h2>
 
@@ -666,18 +866,23 @@
                     </div>
 
 
-                    <!-- PLAYER LEVEL -->
-
                     <div class="profile-level">
 
                         <div class="profile-level-number">
+
                             <span>LEVEL</span>
-                            <strong id="profileLevel">1</strong>
+
+                            <strong id="profileLevel">
+                                1
+                            </strong>
+
                         </div>
+
 
                         <div class="xp-progress">
 
                             <div class="xp-label">
+
                                 <span>XP Progress</span>
 
                                 <strong>
@@ -685,21 +890,23 @@
                                     /
                                     <span id="xpNeeded">100</span>
                                 </strong>
+
                             </div>
 
+
                             <div class="xp-bar">
+
                                 <div
                                     id="xpFill"
                                     class="xp-fill"
                                 ></div>
+
                             </div>
 
                         </div>
 
                     </div>
 
-
-                    <!-- STAT GRID -->
 
                     <div class="profile-stats">
 
@@ -732,18 +939,18 @@
                     </div>
 
 
-                    <!-- ACHIEVEMENTS -->
-
                     <div class="achievements-section">
 
                         <div class="section-title">
 
                             <div>
+
                                 <span class="eyebrow">
                                     MILESTONES
                                 </span>
 
                                 <h3>🏆 Achievements</h3>
+
                             </div>
 
                         </div>
@@ -751,19 +958,15 @@
 
                         <div class="achievement-grid">
 
-
                             <div
                                 class="achievement locked-achievement"
                                 id="achievementFirstStrike"
                             >
-
                                 <span>🎯</span>
-
                                 <div>
                                     <strong>First Strike</strong>
                                     <small>Win your first game</small>
                                 </div>
-
                             </div>
 
 
@@ -771,14 +974,11 @@
                                 class="achievement locked-achievement"
                                 id="achievementCoinHunter"
                             >
-
                                 <span>🪙</span>
-
                                 <div>
                                     <strong>Coin Hunter</strong>
                                     <small>Earn 500 coins</small>
                                 </div>
-
                             </div>
 
 
@@ -786,14 +986,11 @@
                                 class="achievement locked-achievement"
                                 id="achievementLevelThree"
                             >
-
                                 <span>⚡</span>
-
                                 <div>
                                     <strong>Rising Star</strong>
                                     <small>Unlock Level 3</small>
                                 </div>
-
                             </div>
 
 
@@ -801,14 +998,11 @@
                                 class="achievement locked-achievement"
                                 id="achievementLevelFive"
                             >
-
                                 <span>🚀</span>
-
                                 <div>
                                     <strong>Elite Player</strong>
                                     <small>Unlock Level 5</small>
                                 </div>
-
                             </div>
 
 
@@ -816,14 +1010,11 @@
                                 class="achievement locked-achievement"
                                 id="achievementLevelEight"
                             >
-
                                 <span>👑</span>
-
                                 <div>
                                     <strong>The Legend</strong>
                                     <small>Reach Level 8</small>
                                 </div>
-
                             </div>
 
 
@@ -831,14 +1022,11 @@
                                 class="achievement locked-achievement"
                                 id="achievementStreak"
                             >
-
                                 <span>🔥</span>
-
                                 <div>
                                     <strong>On Fire</strong>
                                     <small>Win 5 games</small>
                                 </div>
-
                             </div>
 
                         </div>
@@ -850,9 +1038,7 @@
             </section>
 
 
-            <!-- =================================================
-                 LEADERBOARD SCREEN
-            ================================================== -->
+            <!-- LEADERBOARD -->
 
             <section
                 id="leaderboardScreen"
@@ -863,7 +1049,9 @@
 
                     <div class="screen-heading">
 
-                        <span class="eyebrow">GLOBAL RANKINGS</span>
+                        <span class="eyebrow">
+                            GLOBAL RANKINGS
+                        </span>
 
                         <h2>🌐 Leaderboard</h2>
 
@@ -873,8 +1061,6 @@
 
                     </div>
 
-
-                    <!-- USERNAME SETUP -->
 
                     <div
                         class="username-card"
@@ -900,6 +1086,7 @@
 
                         </div>
 
+
                         <small
                             class="username-hint"
                             id="usernameHint"
@@ -909,8 +1096,6 @@
 
                     </div>
 
-
-                    <!-- REFRESH BAR -->
 
                     <div class="leaderboard-toolbar">
 
@@ -930,60 +1115,42 @@
                     </div>
 
 
-                    <!-- LOADING STATE -->
-
                     <div
                         class="leaderboard-state hidden"
                         id="leaderboardLoading"
                     >
-
                         <div class="spinner"></div>
-
                         <p>Loading rankings…</p>
-
                     </div>
 
-
-                    <!-- ERROR STATE -->
 
                     <div
                         class="leaderboard-state hidden"
                         id="leaderboardError"
                     >
-
                         <span class="state-icon">⚠️</span>
-
                         <p>
                             Couldn't reach the leaderboard service.
                         </p>
-
                         <button
                             class="secondary-button"
                             onclick="loadLeaderboard()"
                         >
                             Try Again
                         </button>
-
                     </div>
 
-
-                    <!-- EMPTY STATE -->
 
                     <div
                         class="leaderboard-state hidden"
                         id="leaderboardEmpty"
                     >
-
                         <span class="state-icon">🌌</span>
-
                         <p>
                             No scores yet. Be the first!
                         </p>
-
                     </div>
 
-
-                    <!-- RANKINGS LIST -->
 
                     <div
                         class="leaderboard-list"
@@ -997,10 +1164,7 @@
         </section>
 
 
-        <!-- =================================================
-             LEVEL UP OVERLAY
-             IMPORTANT: INSIDE APP
-        ================================================== -->
+        <!-- LEVEL UP OVERLAY -->
 
         <div
             id="levelUpOverlay"
@@ -1027,9 +1191,7 @@
 
                 <h2>LEVEL UP!</h2>
 
-                <p>
-                    You reached
-                </p>
+                <p>You reached</p>
 
                 <strong id="newLevelNumber">
                     LEVEL 2
@@ -1051,10 +1213,7 @@
         </div>
 
 
-        <!-- =================================================
-             ACHIEVEMENT OVERLAY
-             IMPORTANT: INSIDE APP
-        ================================================== -->
+        <!-- ACHIEVEMENT OVERLAY -->
 
         <div
             id="achievementOverlay"
@@ -1096,10 +1255,7 @@
         </div>
 
 
-        <!-- =================================================
-             TOAST
-             NOT A BROWSER ALERT
-        ================================================== -->
+        <!-- TOAST -->
 
         <div
             id="toast"
@@ -1109,7 +1265,6 @@
             <span id="toastIcon">✨</span>
             <span id="toastMessage">Nice!</span>
         </div>
-
 
     </main>
 
@@ -1122,11 +1277,6 @@
 
         /* =================================================
            FIREBASE / ACCOUNT SETUP
-
-           The player only sees Game ID + Recovery Code.
-           Firebase internally uses Email/Password auth with
-           a private synthetic address derived from the Game ID.
-           No personal email is collected or displayed.
         ================================================== */
 
         const FIREBASE_CONFIG = {
@@ -1138,6 +1288,7 @@
             appId: "1:182844643075:web:a9f78ac851837ee981fb36"
         };
 
+
         let firestoreDB = null;
         let firebaseAuth = null;
         let firebaseReady = false;
@@ -1145,273 +1296,699 @@
         let currentGameId = "";
         let cloudSaveTimer = null;
         let accountCreatedPending = false;
+        let suppressAuthListener = false;
+
 
         function initFirebase() {
+
             try {
+
                 firebase.initializeApp(FIREBASE_CONFIG);
+
                 firebaseAuth = firebase.auth();
                 firestoreDB = firebase.firestore();
+
                 firebaseReady = true;
 
-                firebaseAuth.onAuthStateChanged(async user => {
-                    currentUser = user;
 
-                    if (!user) {
-                        lockGame();
-                        return;
-                    }
+                firebaseAuth.onAuthStateChanged(
+                    async user => {
 
-                    try {
-                        await loadCloudAccount(user);
-                        if (accountCreatedPending) {
-                            accountCreatedPending = false;
-                            document.getElementById("loginPanel").classList.add("hidden-auth");
-                            document.getElementById("createPanel").classList.add("hidden-auth");
-                            document.getElementById("createdPanel").classList.remove("hidden-auth");
-                        } else {
-                            unlockGame();
+                        currentUser = user;
+
+
+                        if (!user) {
+
+                            lockGame();
+
+                            return;
+
                         }
-                    } catch (error) {
-                        console.error("Account load failed:", error);
-                        showAuthError("Couldn't load your game data. Check your Firebase Firestore setup.");
-                        await firebaseAuth.signOut();
+
+
+                        if (suppressAuthListener) {
+                            return;
+                        }
+
+
+                        try {
+
+                            await loadCloudAccount(user);
+
+
+                            if (accountCreatedPending) {
+
+                                accountCreatedPending = false;
+
+                                document
+                                    .getElementById("loginPanel")
+                                    .classList.add("hidden-auth");
+
+                                document
+                                    .getElementById("createPanel")
+                                    .classList.add("hidden-auth");
+
+                                document
+                                    .getElementById("createdPanel")
+                                    .classList.remove("hidden-auth");
+
+                            }
+
+                            else {
+
+                                unlockGame();
+
+                            }
+
+                        }
+
+                        catch (error) {
+
+                            console.error(
+                                "Account load failed:",
+                                error
+                            );
+
+                            showAuthError(
+                                "Couldn't load your game data. Check your Firebase Firestore setup."
+                            );
+
+                            await firebaseAuth.signOut();
+
+                        }
+
                     }
-                });
-            } catch (error) {
-                console.error("Firebase init failed:", error);
-                firebaseReady = false;
-                showAuthError("Firebase could not start. Check your Firebase configuration.");
+                );
+
             }
+
+            catch (error) {
+
+                console.error(
+                    "Firebase init failed:",
+                    error
+                );
+
+                firebaseReady = false;
+
+                showAuthError(
+                    "Firebase could not start. Check your Firebase configuration."
+                );
+
+            }
+
         }
+
 
         function showAuthError(message) {
-            const loginStatus = document.getElementById("loginStatus");
-            const createStatus = document.getElementById("createStatus");
-            if (loginStatus) loginStatus.textContent = message;
-            if (createStatus) createStatus.textContent = message;
+
+            const loginStatus =
+                document.getElementById("loginStatus");
+
+            const createStatus =
+                document.getElementById("createStatus");
+
+            if (loginStatus)
+                loginStatus.textContent = message;
+
+            if (createStatus)
+                createStatus.textContent = message;
+
         }
+
 
         function setAuthBusy(busy) {
-            document.querySelectorAll("#authScreen button").forEach(button => {
-                button.disabled = busy;
-            });
+
+            document
+                .querySelectorAll("#authScreen button")
+                .forEach(button => {
+
+                    button.disabled = busy;
+
+                });
+
         }
 
+
         function normalizeGameId(value) {
+
             return String(value || "")
                 .toUpperCase()
                 .replace(/[^A-Z0-9]/g, "")
                 .slice(0, 12);
+
         }
+
 
         function makeSyntheticEmail(gameId) {
+
             return `${normalizeGameId(gameId).toLowerCase()}@guessnumber.game`;
+
         }
+
 
         function randomCode(length = 12) {
-            const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-            const bytes = new Uint8Array(length);
+
+            const alphabet =
+                "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+            const bytes =
+                new Uint8Array(length);
+
             crypto.getRandomValues(bytes);
+
             let output = "";
-            for (const byte of bytes) output += alphabet[byte % alphabet.length];
-            return output.match(/.{1,4}/g).join("-");
+
+            for (const byte of bytes) {
+
+                output += alphabet[
+                    byte % alphabet.length
+                ];
+
+            }
+
+            return output
+                .match(/.{1,4}/g)
+                .join("-");
+
         }
+
 
         function randomGameId() {
-            return "GN" + randomCode(8).replace(/-/g, "");
+
+            return "GN" +
+                randomCode(8)
+                    .replace(/-/g, "");
+
         }
+
 
         function showLoginPanel() {
-            document.getElementById("loginPanel").classList.remove("hidden-auth");
-            document.getElementById("createPanel").classList.add("hidden-auth");
-            document.getElementById("createdPanel").classList.add("hidden-auth");
-            document.getElementById("loginStatus").textContent = "";
+
+            document
+                .getElementById("loginPanel")
+                .classList.remove("hidden-auth");
+
+            document
+                .getElementById("createPanel")
+                .classList.add("hidden-auth");
+
+            document
+                .getElementById("createdPanel")
+                .classList.add("hidden-auth");
+
+            document
+                .getElementById("loginStatus")
+                .textContent = "";
+
         }
+
 
         function showCreatePanel() {
-            document.getElementById("loginPanel").classList.add("hidden-auth");
-            document.getElementById("createPanel").classList.remove("hidden-auth");
-            document.getElementById("createdPanel").classList.add("hidden-auth");
-            document.getElementById("createStatus").textContent = "";
+
+            document
+                .getElementById("loginPanel")
+                .classList.add("hidden-auth");
+
+            document
+                .getElementById("createPanel")
+                .classList.remove("hidden-auth");
+
+            document
+                .getElementById("createdPanel")
+                .classList.add("hidden-auth");
+
+            document
+                .getElementById("createStatus")
+                .textContent = "";
+
         }
 
+
         async function createAccount() {
-            if (!firebaseReady) return showAuthError("Firebase is not ready yet.");
+
+            if (!firebaseReady)
+                return showAuthError(
+                    "Firebase is not ready yet."
+                );
+
 
             setAuthBusy(true);
-            const status = document.getElementById("createStatus");
-            status.textContent = "Creating your Game ID…";
+
+            suppressAuthListener = true;
+
+            const status =
+                document.getElementById("createStatus");
+
+            status.textContent =
+                "Creating your Game ID…";
+
 
             try {
+
                 let gameId = randomGameId();
                 let recoveryCode = randomCode(12);
                 let credential = null;
 
-                // Extremely unlikely collision protection: retry a few times.
-                for (let attempt = 0; attempt < 5; attempt++) {
+
+                for (
+                    let attempt = 0;
+                    attempt < 5;
+                    attempt++
+                ) {
+
                     try {
-                        credential = await firebaseAuth.createUserWithEmailAndPassword(
-                            makeSyntheticEmail(gameId),
-                            recoveryCode.replace(/-/g, "")
-                        );
+
+                        credential =
+                            await firebaseAuth
+                                .createUserWithEmailAndPassword(
+                                    makeSyntheticEmail(gameId),
+                                    recoveryCode.replace(/-/g, "")
+                                );
+
                         break;
-                    } catch (error) {
-                        if (error.code !== "auth/email-already-in-use") throw error;
+
+                    }
+
+                    catch (error) {
+
+                        if (
+                            error.code !==
+                            "auth/email-already-in-use"
+                        ) {
+                            throw error;
+                        }
+
                         gameId = randomGameId();
                         recoveryCode = randomCode(12);
+
                     }
+
                 }
 
-                if (!credential) throw new Error("Could not create account.");
 
-                const uid = credential.user.uid;
-                const initialSave = structuredClone(defaultSave);
+                if (!credential)
+                    throw new Error(
+                        "Could not create account."
+                    );
+
+
+                const uid =
+                    credential.user.uid;
+
+                const initialSave =
+                    structuredClone(defaultSave);
+
                 initialSave.username = "";
 
-                await firestoreDB.collection("players").doc(uid).set({
-                    gameId,
-                    username: "",
-                    save: initialSave,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+
+                await firestoreDB
+                    .collection("players")
+                    .doc(uid)
+                    .set({
+
+                        gameId,
+
+                        username: "",
+
+                        save: initialSave,
+
+                        createdAt:
+                            firebase.firestore
+                                .FieldValue
+                                .serverTimestamp(),
+
+                        updatedAt:
+                            firebase.firestore
+                                .FieldValue
+                                .serverTimestamp()
+
+                    });
+
 
                 currentGameId = gameId;
-                save = initialSave;
-                accountCreatedPending = true;
-                localStorage.setItem(`guessNumberSave_${uid}`, JSON.stringify(save));
 
-                document.getElementById("createdGameId").textContent = gameId;
-                document.getElementById("createdRecoveryCode").textContent = recoveryCode;
-                document.getElementById("loginPanel").classList.add("hidden-auth");
-                document.getElementById("createPanel").classList.add("hidden-auth");
-                document.getElementById("createdPanel").classList.remove("hidden-auth");
+                save = initialSave;
+
+                accountCreatedPending = true;
+
+
+                localStorage.setItem(
+                    `guessNumberSave_${uid}`,
+                    JSON.stringify(save)
+                );
+
+
+                document
+                    .getElementById("createdGameId")
+                    .textContent = gameId;
+
+                document
+                    .getElementById("createdRecoveryCode")
+                    .textContent = recoveryCode;
+
+
+                document
+                    .getElementById("loginPanel")
+                    .classList.add("hidden-auth");
+
+                document
+                    .getElementById("createPanel")
+                    .classList.add("hidden-auth");
+
+                document
+                    .getElementById("createdPanel")
+                    .classList.remove("hidden-auth");
+
                 status.textContent = "";
-            } catch (error) {
-                console.error("Create account failed:", error);
-                status.textContent = firebaseAuthError(error);
-            } finally {
-                setAuthBusy(false);
+
             }
+
+            catch (error) {
+
+                console.error(
+                    "Create account failed:",
+                    error
+                );
+
+                status.textContent =
+                    firebaseAuthError(error);
+
+
+                if (firebaseAuth.currentUser) {
+
+                    await firebaseAuth
+                        .signOut()
+                        .catch(() => {});
+
+                }
+
+            }
+
+            finally {
+
+                suppressAuthListener = false;
+
+                setAuthBusy(false);
+
+            }
+
         }
+
 
         async function loginAccount() {
-            if (!firebaseReady) return showAuthError("Firebase is not ready yet.");
 
-            const gameId = normalizeGameId(document.getElementById("loginGameId").value);
-            const recoveryCode = document.getElementById("loginRecoveryCode").value
-                .toUpperCase()
-                .replace(/[^A-Z0-9]/g, "");
-            const status = document.getElementById("loginStatus");
+            if (!firebaseReady)
+                return showAuthError(
+                    "Firebase is not ready yet."
+                );
+
+
+            const gameId =
+                normalizeGameId(
+                    document.getElementById(
+                        "loginGameId"
+                    ).value
+                );
+
+
+            const recoveryCode =
+                document
+                    .getElementById(
+                        "loginRecoveryCode"
+                    )
+                    .value
+                    .toUpperCase()
+                    .replace(/[^A-Z0-9]/g, "");
+
+
+            const status =
+                document.getElementById(
+                    "loginStatus"
+                );
+
 
             if (!/^GN[A-Z0-9]{8}$/.test(gameId)) {
-                status.textContent = "Enter a valid Game ID.";
+
+                status.textContent =
+                    "Enter a valid Game ID.";
+
                 return;
+
             }
+
 
             if (!/^[A-Z0-9]{12}$/.test(recoveryCode)) {
-                status.textContent = "Enter your 12-character Recovery Code.";
+
+                status.textContent =
+                    "Enter your 12-character Recovery Code.";
+
                 return;
+
             }
+
 
             setAuthBusy(true);
-            status.textContent = "Loading your account…";
+
+            status.textContent =
+                "Loading your account…";
+
 
             try {
-                await firebaseAuth.signInWithEmailAndPassword(
-                    makeSyntheticEmail(gameId),
-                    recoveryCode
-                );
-            } catch (error) {
-                console.error("Login failed:", error);
-                status.textContent = "Game ID or Recovery Code is incorrect.";
-                setAuthBusy(false);
+
+                await firebaseAuth
+                    .signInWithEmailAndPassword(
+                        makeSyntheticEmail(gameId),
+                        recoveryCode
+                    );
+
             }
+
+            catch (error) {
+
+                console.error(
+                    "Login failed:",
+                    error
+                );
+
+                status.textContent =
+                    "Game ID or Recovery Code is incorrect.";
+
+                setAuthBusy(false);
+
+            }
+
         }
+
 
         async function loadCloudAccount(user) {
-            const doc = await firestoreDB.collection("players").doc(user.uid).get();
 
-            if (!doc.exists) {
-                throw new Error("Player document not found.");
-            }
+            const doc =
+                await firestoreDB
+                    .collection("players")
+                    .doc(user.uid)
+                    .get();
 
-            const data = doc.data() || {};
-            currentGameId = data.gameId || "";
-            save = mergeSave(data.save || {});
-            localStorage.setItem(`guessNumberSave_${user.uid}`, JSON.stringify(save));
+
+            if (!doc.exists)
+                throw new Error(
+                    "Player document not found."
+                );
+
+
+            const data =
+                doc.data() || {};
+
+
+            currentGameId =
+                data.gameId || "";
+
+
+            save =
+                mergeSave(
+                    data.save || {}
+                );
+
+
+            localStorage.setItem(
+                `guessNumberSave_${user.uid}`,
+                JSON.stringify(save)
+            );
+
 
             updateUI();
             updateLevelButtons();
             renderUsernameCard();
+
         }
+
 
         function mergeSave(parsed) {
+
             return {
+
                 ...structuredClone(defaultSave),
+
                 ...(parsed || {}),
+
                 items: {
-                    ...structuredClone(defaultSave.items),
-                    ...((parsed && parsed.items) || {})
+
+                    ...structuredClone(
+                        defaultSave.items
+                    ),
+
+                    ...(
+                        (parsed && parsed.items) ||
+                        {}
+                    )
+
                 }
+
             };
+
         }
+
 
         async function cloudSaveGame() {
-            if (!firebaseReady || !currentUser) return;
+
+            if (
+                !firebaseReady ||
+                !currentUser
+            ) return;
+
 
             try {
-                await firestoreDB.collection("players").doc(currentUser.uid).set({
-                    gameId: currentGameId,
-                    username: save.username || "",
-                    save,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-            } catch (error) {
-                console.error("Cloud save failed:", error);
+
+                await firestoreDB
+                    .collection("players")
+                    .doc(currentUser.uid)
+                    .set({
+
+                        gameId: currentGameId,
+
+                        username:
+                            save.username || "",
+
+                        save,
+
+                        updatedAt:
+                            firebase.firestore
+                                .FieldValue
+                                .serverTimestamp()
+
+                    }, {
+                        merge: true
+                    });
+
             }
+
+            catch (error) {
+
+                console.error(
+                    "Cloud save failed:",
+                    error
+                );
+
+            }
+
         }
+
 
         function lockGame() {
-            const app = document.getElementById("gameApp");
-            const auth = document.getElementById("authScreen");
-            if (app) app.classList.add("auth-locked");
-            if (auth) auth.classList.remove("hidden-auth");
+
+            const app =
+                document.getElementById("gameApp");
+
+            const auth =
+                document.getElementById("authScreen");
+
+
+            if (app)
+                app.classList.add("auth-locked");
+
+            if (auth)
+                auth.classList.remove("hidden-auth");
+
         }
 
+
         function unlockGame() {
-            const app = document.getElementById("gameApp");
-            const auth = document.getElementById("authScreen");
-            if (app) app.classList.remove("auth-locked");
-            if (auth) auth.classList.add("hidden-auth");
+
+            const app =
+                document.getElementById("gameApp");
+
+            const auth =
+                document.getElementById("authScreen");
+
+
+            if (app)
+                app.classList.remove("auth-locked");
+
+            if (auth)
+                auth.classList.add("hidden-auth");
+
 
             updateUI();
             updateLevelButtons();
             renderUsernameCard();
-            const idLabel = document.getElementById("currentGameIdLabel");
-            if (idLabel) idLabel.textContent = currentGameId ? `Game ID: ${currentGameId}` : "";
+
             startLevel();
+
         }
+
 
         function enterGame() {
+
             unlockGame();
+
         }
+
 
         async function switchAccount() {
+
             if (!firebaseAuth) return;
+
             await firebaseAuth.signOut();
+
             location.reload();
+
         }
 
+
         function firebaseAuthError(error) {
-            if (error && error.code === "auth/operation-not-allowed") {
-                return "Enable Email/Password in Firebase Authentication → Sign-in method.";
+
+            if (
+                error &&
+                error.code ===
+                "auth/operation-not-allowed"
+            ) {
+
+                return (
+                    "Enable Email/Password in Firebase Authentication → Sign-in method."
+                );
+
             }
-            if (error && error.code === "auth/too-many-requests") {
-                return "Too many attempts. Wait a little and try again.";
+
+
+            if (
+                error &&
+                error.code ===
+                "auth/too-many-requests"
+            ) {
+
+                return (
+                    "Too many attempts. Wait a little and try again."
+                );
+
             }
-            return "Account action failed. Check Firebase Authentication and Firestore.";
+
+
+            return (
+                "Account action failed. Check Firebase Authentication and Firestore."
+            );
+
         }
+
 
         /* =================================================
            GAME DATA
@@ -1519,29 +2096,69 @@
         };
 
 
-        let save = structuredClone(defaultSave);
+        let save =
+            structuredClone(defaultSave);
+
 
         function loadSave() {
-            if (!currentUser) return structuredClone(defaultSave);
+
+            if (!currentUser)
+                return structuredClone(
+                    defaultSave
+                );
+
+
             try {
-                const stored = localStorage.getItem(`guessNumberSave_${currentUser.uid}`);
-                if (!stored) return structuredClone(defaultSave);
-                return mergeSave(JSON.parse(stored));
-            } catch (error) {
-                return structuredClone(defaultSave);
+
+                const stored =
+                    localStorage.getItem(
+                        `guessNumberSave_${currentUser.uid}`
+                    );
+
+
+                if (!stored)
+                    return structuredClone(
+                        defaultSave
+                    );
+
+
+                return mergeSave(
+                    JSON.parse(stored)
+                );
+
             }
+
+            catch (error) {
+
+                return structuredClone(
+                    defaultSave
+                );
+
+            }
+
         }
 
+
         function saveGame() {
+
             if (!currentUser) return;
+
 
             localStorage.setItem(
                 `guessNumberSave_${currentUser.uid}`,
                 JSON.stringify(save)
             );
 
+
             clearTimeout(cloudSaveTimer);
-            cloudSaveTimer = setTimeout(cloudSaveGame, 250);
+
+
+            cloudSaveTimer =
+                setTimeout(
+                    cloudSaveGame,
+                    500
+                );
+
         }
 
 
@@ -1565,6 +2182,25 @@
 
 
         /* =================================================
+           PERFORMANCE SETTINGS
+        ================================================== */
+
+        const performanceMode = {
+
+            mobile:
+                window.matchMedia(
+                    "(max-width: 700px)"
+                ).matches,
+
+            reducedMotion:
+                window.matchMedia(
+                    "(prefers-reduced-motion: reduce)"
+                ).matches
+
+        };
+
+
+        /* =================================================
            PARTICLES
         ================================================== */
 
@@ -1575,41 +2211,82 @@
                     "particles"
                 );
 
+
             if (!container) return;
 
+
+            container.innerHTML = "";
+
+
+            const mobile =
+                performanceMode.mobile;
+
+
+            if (
+                performanceMode.reducedMotion
+            ) {
+
+                count = 0;
+
+            }
+
+            else {
+
+                count =
+                    mobile
+                        ? 10
+                        : 24;
+
+            }
+
+
             const colors = [
-                "rgba(96, 165, 250, 0.9)",   // blue
-                "rgba(192, 160, 250, 0.85)"  // purple
+
+                "rgba(96, 165, 250, 0.9)",
+
+                "rgba(192, 160, 250, 0.85)"
+
             ];
 
-            for (let i = 0; i < count; i++) {
+
+            for (
+                let i = 0;
+                i < count;
+                i++
+            ) {
 
                 const particle =
                     document.createElement(
                         "div"
                     );
 
+
                 particle.className =
                     "particle";
+
 
                 const size =
                     Math.random() * 3.5 + 2.5;
 
+
                 const left =
                     Math.random() * 100;
+
 
                 const duration =
                     Math.random() * 10 + 9;
 
-                // Start particles already mid-flight
-                // (negative delay) so they're visible
-                // immediately instead of after a long wait.
+
                 const delay =
                     -(Math.random() * duration);
 
+
                 const drift =
-                    (Math.random() * 80 - 40) +
-                    "px";
+                    (
+                        Math.random() * 60 -
+                        30
+                    ) + "px";
+
 
                 const color =
                     colors[
@@ -1619,14 +2296,18 @@
                         )
                     ];
 
-                const peakOpacity =
-                    (Math.random() * 0.3 + 0.6)
-                        .toFixed(2);
 
-                // Roughly 1 in 4 particles is a
-                // twinkling star instead of a dot.
+                const peakOpacity =
+                    (
+                        Math.random() * 0.3 +
+                        0.6
+                    ).toFixed(2);
+
+
                 const isStar =
-                    Math.random() < 0.25;
+                    !mobile &&
+                    Math.random() < 0.2;
+
 
                 if (isStar) {
 
@@ -1637,8 +2318,10 @@
                     particle.textContent =
                         "✦";
 
+
                     const starSize =
                         size * 6 + 6;
+
 
                     particle.style.fontSize =
                         `${starSize}px`;
@@ -1646,9 +2329,7 @@
                     particle.style.color =
                         color;
 
-                    // Small, tight shadow so the star's
-                    // points stay sharp instead of
-                    // blurring into a round blob.
+
                     particle.style.textShadow =
                         `0 0 6px ${color}`;
 
@@ -1665,29 +2346,40 @@
                     particle.style.background =
                         color;
 
-                    particle.style.boxShadow =
-                        `0 0 ${size * 1.6}px ${color}`;
+
+                    if (!mobile) {
+
+                        particle.style.boxShadow =
+                            `0 0 ${size * 1.6}px ${color}`;
+
+                    }
 
                 }
+
 
                 particle.style.left =
                     `${left}%`;
 
+
                 particle.style.animationDuration =
                     `${duration}s`;
 
+
                 particle.style.animationDelay =
                     `${delay}s`;
+
 
                 particle.style.setProperty(
                     "--drift",
                     drift
                 );
 
+
                 particle.style.setProperty(
                     "--peak-opacity",
                     peakOpacity
                 );
+
 
                 container.appendChild(
                     particle
@@ -1717,6 +2409,7 @@
 
             }
 
+
             if (
                 audioContext.state ===
                 "suspended"
@@ -1725,6 +2418,7 @@
                 audioContext.resume();
 
             }
+
 
             return audioContext;
 
@@ -1742,32 +2436,44 @@
                 const ctx =
                     getAudioContext();
 
+
                 const oscillator =
                     ctx.createOscillator();
+
 
                 const gain =
                     ctx.createGain();
 
-                oscillator.type = type;
+
+                oscillator.type =
+                    type;
+
 
                 oscillator.frequency.value =
                     frequency;
+
 
                 gain.gain.setValueAtTime(
                     0.05,
                     ctx.currentTime
                 );
 
+
                 gain.gain.exponentialRampToValueAtTime(
                     0.001,
                     ctx.currentTime + duration
                 );
 
+
                 oscillator.connect(gain);
 
-                gain.connect(ctx.destination);
+                gain.connect(
+                    ctx.destination
+                );
+
 
                 oscillator.start();
+
 
                 oscillator.stop(
                     ctx.currentTime + duration
@@ -1777,8 +2483,7 @@
 
             catch (error) {
 
-                // Sound is optional.
-                // The game continues if audio is unavailable.
+                // Audio is optional.
 
             }
 
@@ -1787,15 +2492,26 @@
 
         function playCorrectSound() {
 
-            playSound(523, 0.08);
+            playSound(
+                523,
+                0.08
+            );
+
 
             setTimeout(
-                () => playSound(659, 0.1),
+                () => playSound(
+                    659,
+                    0.1
+                ),
                 80
             );
 
+
             setTimeout(
-                () => playSound(784, 0.14),
+                () => playSound(
+                    784,
+                    0.14
+                ),
                 160
             );
 
@@ -1832,6 +2548,7 @@
                 "square"
             );
 
+
             setTimeout(
                 () => playSound(
                     1319,
@@ -1846,20 +2563,35 @@
 
         function playLevelUpSound() {
 
-            playSound(523, 0.1);
+            playSound(
+                523,
+                0.1
+            );
+
 
             setTimeout(
-                () => playSound(659, 0.1),
+                () => playSound(
+                    659,
+                    0.1
+                ),
                 100
             );
 
+
             setTimeout(
-                () => playSound(784, 0.1),
+                () => playSound(
+                    784,
+                    0.1
+                ),
                 200
             );
 
+
             setTimeout(
-                () => playSound(1046, 0.2),
+                () => playSound(
+                    1046,
+                    0.2
+                ),
                 300
             );
 
@@ -1877,8 +2609,12 @@
 
         function startBackgroundMusic() {
 
+            if (musicPlaying) return;
+
+
             const ctx =
                 getAudioContext();
+
 
             const now =
                 ctx.currentTime;
@@ -1887,27 +2623,32 @@
             const masterGain =
                 ctx.createGain();
 
+
             masterGain.gain.setValueAtTime(
                 0,
                 now
             );
 
+
             masterGain.gain.linearRampToValueAtTime(
-                0.14,
-                now + 2
+                performanceMode.mobile
+                    ? 0.07
+                    : 0.14,
+                now + 1.5
             );
+
 
             masterGain.connect(
                 ctx.destination
             );
 
 
-            // Soft ambient pad chord (C3, E3, G3)
-            // with slow drifting LFOs so it
-            // doesn't feel static or looped.
-
             const notes =
-                [130.81, 164.81, 196.00];
+                performanceMode.mobile
+
+                    ? [130.81, 196.00]
+
+                    : [130.81, 164.81, 196.00];
 
 
             const oscillators =
@@ -1917,7 +2658,10 @@
                         const osc =
                             ctx.createOscillator();
 
-                        osc.type = "sine";
+
+                        osc.type =
+                            "sine";
+
 
                         osc.frequency.value =
                             freq;
@@ -1926,51 +2670,96 @@
                         const oscGain =
                             ctx.createGain();
 
+
                         oscGain.gain.value =
-                            0.6;
+                            performanceMode.mobile
+                                ? 0.35
+                                : 0.6;
 
 
-                        const lfo =
-                            ctx.createOscillator();
+                        if (!performanceMode.mobile) {
 
-                        lfo.frequency.value =
-                            0.05 + index * 0.02;
-
-
-                        const lfoGain =
-                            ctx.createGain();
-
-                        lfoGain.gain.value = 4;
+                            const lfo =
+                                ctx.createOscillator();
 
 
-                        lfo.connect(lfoGain);
+                            lfo.frequency.value =
+                                0.05 +
+                                index * 0.02;
 
-                        lfoGain.connect(
-                            osc.frequency
+
+                            const lfoGain =
+                                ctx.createGain();
+
+
+                            lfoGain.gain.value =
+                                4;
+
+
+                            lfo.connect(
+                                lfoGain
+                            );
+
+
+                            lfoGain.connect(
+                                osc.frequency
+                            );
+
+
+                            lfo.start();
+
+
+                            osc.connect(
+                                oscGain
+                            );
+
+
+                            oscGain.connect(
+                                masterGain
+                            );
+
+
+                            osc.start();
+
+
+                            return {
+                                osc,
+                                lfo
+                            };
+
+                        }
+
+
+                        osc.connect(
+                            oscGain
                         );
 
-                        lfo.start();
-
-
-                        osc.connect(oscGain);
 
                         oscGain.connect(
                             masterGain
                         );
 
+
                         osc.start();
 
 
-                        return { osc, lfo };
+                        return {
+                            osc,
+                            lfo: null
+                        };
 
                     }
                 );
 
 
             musicNodes = {
+
                 masterGain,
+
                 oscillators
+
             };
+
 
             musicPlaying = true;
 
@@ -1979,11 +2768,13 @@
 
         function stopBackgroundMusic() {
 
-            if (!musicNodes) return;
+            if (!musicNodes)
+                return;
 
 
             const ctx =
                 getAudioContext();
+
 
             const now =
                 ctx.currentTime;
@@ -1992,7 +2783,7 @@
             musicNodes.masterGain.gain
                 .linearRampToValueAtTime(
                     0,
-                    now + 1
+                    now + 0.6
                 );
 
 
@@ -2003,18 +2794,28 @@
             setTimeout(
                 () => {
 
-                    nodesToStop.oscillators.forEach(
-                        ({ osc, lfo }) => {
+                    nodesToStop
+                        .oscillators
+                        .forEach(
+                            ({ osc, lfo }) => {
 
-                            osc.stop();
+                                try {
+                                    osc.stop();
+                                } catch {}
 
-                            lfo.stop();
+                                if (lfo) {
 
-                        }
-                    );
+                                    try {
+                                        lfo.stop();
+                                    } catch {}
+
+                                }
+
+                            }
+                        );
 
                 },
-                1100
+                700
             );
 
 
@@ -2032,6 +2833,7 @@
                     "musicIcon"
                 );
 
+
             const label =
                 document.getElementById(
                     "musicLabel"
@@ -2042,9 +2844,11 @@
 
                 stopBackgroundMusic();
 
-                icon.textContent = "🔇";
+                icon.textContent =
+                    "🔇";
 
-                label.textContent = "Off";
+                label.textContent =
+                    "Off";
 
             }
 
@@ -2052,9 +2856,11 @@
 
                 startBackgroundMusic();
 
-                icon.textContent = "🔊";
+                icon.textContent =
+                    "🔊";
 
-                label.textContent = "On";
+                label.textContent =
+                    "On";
 
             }
 
@@ -2072,16 +2878,20 @@
                     "result"
                 );
 
+
             const target =
                 document.querySelector(
                     ".hud-item.coins"
                 );
 
-            if (!origin || !target) return;
+
+            if (!origin || !target)
+                return;
 
 
             const originRect =
                 origin.getBoundingClientRect();
+
 
             const targetRect =
                 target.getBoundingClientRect();
@@ -2091,20 +2901,26 @@
                 originRect.left +
                 originRect.width / 2;
 
+
             const startY =
                 originRect.top +
                 originRect.height / 2;
 
+
             const endX =
                 targetRect.left +
                 targetRect.width / 2;
+
 
             const endY =
                 targetRect.top +
                 targetRect.height / 2;
 
 
-            const coinCount = 6;
+            const coinCount =
+                performanceMode.mobile
+                    ? 3
+                    : 6;
 
 
             for (
@@ -2118,34 +2934,46 @@
                         "div"
                     );
 
+
                 coin.className =
                     "flying-coin";
 
-                coin.textContent = "🪙";
+
+                coin.textContent =
+                    "🪙";
 
 
                 const jitterX =
-                    (Math.random() * 40 - 20);
+                    performanceMode.mobile
+                        ? 0
+                        : Math.random() * 40 - 20;
+
 
                 const jitterY =
-                    (Math.random() * 30 - 15);
+                    performanceMode.mobile
+                        ? 0
+                        : Math.random() * 30 - 15;
 
 
                 coin.style.left =
                     `${startX + jitterX}px`;
 
+
                 coin.style.top =
                     `${startY + jitterY}px`;
+
 
                 coin.style.setProperty(
                     "--fly-x",
                     `${endX - startX - jitterX}px`
                 );
 
+
                 coin.style.setProperty(
                     "--fly-y",
                     `${endY - startY - jitterY}px`
                 );
+
 
                 coin.style.animationDelay =
                     `${i * 55}ms`;
@@ -2158,7 +2986,7 @@
 
                 setTimeout(
                     () => coin.remove(),
-                    950 + i * 55
+                    1000
                 );
 
             }
@@ -2171,14 +2999,18 @@
                         "coin-pulse"
                     );
 
+
                     void target.offsetWidth;
+
 
                     target.classList.add(
                         "coin-pulse"
                     );
 
                 },
-                750
+                performanceMode.mobile
+                    ? 550
+                    : 750
             );
 
         }
@@ -2191,16 +3023,29 @@
                     "result"
                 );
 
-            if (!origin) return;
+
+            if (!origin)
+                return;
+
+
+            if (
+                performanceMode.reducedMotion
+            ) return;
 
 
             const sparkleChars =
                 ["✦", "✧", "⭐"];
 
 
+            const count =
+                performanceMode.mobile
+                    ? 4
+                    : 8;
+
+
             for (
                 let i = 0;
-                i < 8;
+                i < count;
                 i++
             ) {
 
@@ -2209,8 +3054,10 @@
                         "span"
                     );
 
+
                 sparkle.className =
                     "sparkle-burst";
+
 
                 sparkle.textContent =
                     sparkleChars[
@@ -2222,10 +3069,16 @@
 
 
                 const angle =
-                    (Math.PI * 2 * i) / 8;
+                    (Math.PI * 2 * i) /
+                    count;
+
 
                 const distance =
-                    60 + Math.random() * 30;
+                    performanceMode.mobile
+                        ? 40 +
+                          Math.random() * 20
+                        : 60 +
+                          Math.random() * 30;
 
 
                 sparkle.style.setProperty(
@@ -2236,6 +3089,7 @@
                     }px`
                 );
 
+
                 sparkle.style.setProperty(
                     "--spark-y",
                     `${
@@ -2243,6 +3097,7 @@
                         distance
                     }px`
                 );
+
 
                 sparkle.style.color =
                     Math.random() < 0.5
@@ -2274,14 +3129,18 @@
                     `.level-button[data-level="${levelNumber}"]`
                 );
 
-            if (!button) return;
+
+            if (!button)
+                return;
 
 
             button.classList.remove(
                 "unlock-animation"
             );
 
+
             void button.offsetWidth;
+
 
             button.classList.add(
                 "unlock-animation"
@@ -2289,32 +3148,40 @@
 
         }
 
+
         function showScreen(screenId) {
 
             document
                 .querySelectorAll(".screen")
-                .forEach(screen => {
+                .forEach(
+                    screen => {
 
-                    screen.classList.remove(
-                        "active-screen"
-                    );
+                        screen.classList.remove(
+                            "active-screen"
+                        );
 
-                });
+                    }
+                );
 
 
             document
                 .querySelectorAll(".nav-button")
-                .forEach(button => {
+                .forEach(
+                    button => {
 
-                    button.classList.remove(
-                        "active"
-                    );
+                        button.classList.remove(
+                            "active"
+                        );
 
-                });
+                    }
+                );
 
 
             const screen =
-                document.getElementById(screenId);
+                document.getElementById(
+                    screenId
+                );
+
 
             if (screen) {
 
@@ -2330,6 +3197,7 @@
                     `.nav-button[data-screen="${screenId}"]`
                 );
 
+
             if (navButton) {
 
                 navButton.classList.add(
@@ -2342,7 +3210,10 @@
             playClickSound();
 
 
-            if (screenId === "leaderboardScreen") {
+            if (
+                screenId ===
+                "leaderboardScreen"
+            ) {
 
                 loadLeaderboard();
 
@@ -2370,6 +3241,7 @@
                     "Unlock this level first!"
                 );
 
+
                 playWrongSound();
 
                 return;
@@ -2379,6 +3251,7 @@
 
             currentLevel =
                 levelNumber;
+
 
             updateLevelButtons();
 
@@ -2406,6 +3279,7 @@
 
             attempts = 0;
 
+
             lives =
                 level.lives;
 
@@ -2424,42 +3298,46 @@
 
             document
                 .getElementById("lives")
-                .textContent = lives;
+                .textContent =
+                lives;
 
 
             document
                 .getElementById("attempts")
-                .textContent = attempts;
+                .textContent =
+                attempts;
 
 
             document
                 .getElementById("bestScore")
                 .textContent =
-                    save.bestScores[currentLevel] ||
-                    "---";
+                save.bestScores[currentLevel] ||
+                "---";
 
 
             document
                 .getElementById("gameTitle")
                 .textContent =
-                    `Level ${currentLevel}`;
+                `Level ${currentLevel}`;
 
 
             document
                 .getElementById("gameMessage")
                 .textContent =
-                    `I'm thinking of a number from 1 to ${level.maximum.toLocaleString()}!`;
+                `I'm thinking of a number from 1 to ${level.maximum.toLocaleString()}!`;
 
 
             document
                 .getElementById("result")
-                .textContent = "";
+                .textContent =
+                "";
 
 
             const guess =
                 document.getElementById(
                     "guess"
                 );
+
 
             const guessButton =
                 document.getElementById(
@@ -2478,7 +3356,14 @@
             guess.max =
                 level.maximum;
 
-            guess.focus();
+
+            if (
+                !performanceMode.mobile
+            ) {
+
+                guess.focus();
+
+            }
 
 
             playSound(
@@ -2495,11 +3380,8 @@
 
         function checkGuess() {
 
-            if (!gameActive) {
-
+            if (!gameActive)
                 return;
-
-            }
 
 
             playClickSound();
@@ -2518,7 +3400,9 @@
 
 
             const guess =
-                Number(input.value);
+                Number(
+                    input.value
+                );
 
 
             const maximum =
@@ -2546,12 +3430,8 @@
             document
                 .getElementById("attempts")
                 .textContent =
-                    attempts;
+                attempts;
 
-
-            /* =============================================
-               CORRECT
-            ============================================== */
 
             if (
                 guess ===
@@ -2565,17 +3445,13 @@
             }
 
 
-            /* =============================================
-               WRONG
-            ============================================== */
-
             lives--;
 
 
             document
                 .getElementById("lives")
                 .textContent =
-                    lives;
+                lives;
 
 
             playWrongSound();
@@ -2607,13 +3483,16 @@
                     ".guess-area"
                 );
 
+
             if (guessArea) {
 
                 guessArea.classList.remove(
                     "shake-animation"
                 );
 
+
                 void guessArea.offsetWidth;
+
 
                 guessArea.classList.add(
                     "shake-animation"
@@ -2631,7 +3510,13 @@
             }
 
 
-            input.focus();
+            if (
+                !performanceMode.mobile
+            ) {
+
+                input.focus();
+
+            }
 
         }
 
@@ -2654,43 +3539,38 @@
 
             playCorrectSound();
 
+
             setTimeout(
                 playCoinSound,
                 260
             );
 
 
-            document
-                .getElementById("result")
-                .textContent =
-                    "🎉 CORRECT!";
-
-
-            document
-                .getElementById("result")
-                .classList.remove(
-                    "correct-animation"
+            const result =
+                document.getElementById(
+                    "result"
                 );
 
 
-            void document
-                .getElementById("result")
-                .offsetWidth;
+            result.textContent =
+                "🎉 CORRECT!";
 
 
-            document
-                .getElementById("result")
-                .classList.add(
-                    "correct-animation"
-                );
+            result.classList.remove(
+                "correct-animation"
+            );
+
+
+            void result.offsetWidth;
+
+
+            result.classList.add(
+                "correct-animation"
+            );
 
 
             spawnSparkleBurst();
 
-
-            /* =============================================
-               COINS
-            ============================================== */
 
             let coinReward =
                 level.reward;
@@ -2712,10 +3592,6 @@
             flyCoinsToHUD();
 
 
-            /* =============================================
-               XP
-            ============================================== */
-
             let xpReward =
                 level.xp;
 
@@ -2724,9 +3600,10 @@
                 save.items.xpBoost
             ) {
 
-                xpReward = Math.floor(
-                    xpReward * 1.5
-                );
+                xpReward =
+                    Math.floor(
+                        xpReward * 1.5
+                    );
 
             }
 
@@ -2734,10 +3611,6 @@
             save.xp +=
                 xpReward;
 
-
-            /* =============================================
-               WINS + STREAK
-            ============================================== */
 
             save.totalWins++;
 
@@ -2755,10 +3628,6 @@
             }
 
 
-            /* =============================================
-               BEST SCORE
-            ============================================== */
-
             if (
                 !save.bestScores[currentLevel] ||
                 attempts <
@@ -2771,17 +3640,12 @@
             }
 
 
-            /* =============================================
-               UNLOCK NEXT LEVEL
-            ============================================== */
-
             const previousUnlockedLevel =
                 save.unlockedLevel;
 
 
             if (
-                currentLevel <
-                8 &&
+                currentLevel < 8 &&
                 currentLevel >=
                 save.unlockedLevel
             ) {
@@ -2791,10 +3655,6 @@
 
             }
 
-
-            /* =============================================
-               PLAYER LEVEL
-            ============================================== */
 
             const oldPlayerLevel =
                 save.playerLevel;
@@ -2807,14 +3667,11 @@
                 save.playerLevel;
 
 
-            /* =============================================
-               SAVE
-            ============================================== */
-
             saveGame();
 
 
             updateUI();
+
 
             updateLevelButtons();
 
@@ -2837,7 +3694,7 @@
             document
                 .getElementById("gameMessage")
                 .textContent =
-                    `🎉 +${coinReward} coins • +${xpReward} XP`;
+                `🎉 +${coinReward} coins • +${xpReward} XP`;
 
 
             showToast(
@@ -2846,16 +3703,8 @@
             );
 
 
-            /* =============================================
-               ACHIEVEMENTS
-            ============================================== */
-
             checkAchievements();
 
-
-            /* =============================================
-               LEVEL UP
-            ============================================== */
 
             if (
                 newPlayerLevel >
@@ -2863,9 +3712,10 @@
             ) {
 
                 setTimeout(
-                    () => showLevelUp(
-                        newPlayerLevel
-                    ),
+                    () =>
+                        showLevelUp(
+                            newPlayerLevel
+                        ),
                     500
                 );
 
@@ -2884,6 +3734,7 @@
 
             disableGame();
 
+
             save.currentStreak = 0;
 
             saveGame();
@@ -2894,19 +3745,20 @@
             document
                 .getElementById("result")
                 .textContent =
-                    "💀 GAME OVER!";
+                "💀 GAME OVER!";
 
 
             document
                 .getElementById("gameMessage")
                 .textContent =
-                    `The number was ${secretNumber.toLocaleString()}.`;
+                `The number was ${secretNumber.toLocaleString()}.`;
 
 
             const gamePanel =
                 document.querySelector(
                     ".game-panel"
                 );
+
 
             if (gamePanel) {
 
@@ -2915,7 +3767,9 @@
                     "game-over-animation"
                 );
 
+
                 void gamePanel.offsetWidth;
+
 
                 gamePanel.classList.add(
                     "shake-animation",
@@ -2965,7 +3819,7 @@
 
 
         /* =================================================
-           PLAYER LEVEL CALCULATION
+           PLAYER LEVEL
         ================================================== */
 
         function updatePlayerLevel() {
@@ -3042,9 +3896,11 @@
 
 
             document
-                .getElementById("achievementCount")
+                .getElementById(
+                    "achievementCount"
+                )
                 .textContent =
-                    `${save.achievements.length} / 6`;
+                `${save.achievements.length} / 6`;
 
 
             const xpIntoLevel =
@@ -3054,13 +3910,13 @@
             document
                 .getElementById("xpNeeded")
                 .textContent =
-                    "100";
+                "100";
 
 
             document
                 .getElementById("xpFill")
                 .style.width =
-                    `${xpIntoLevel}%`;
+                `${xpIntoLevel}%`;
 
 
             updateShop();
@@ -3072,7 +3928,11 @@
 
         /* =================================================
            ANIMATED NUMBER COUNT-UP
+           FIXED: prevents stacked RAF animations
         ================================================== */
+
+        const numberAnimations = {};
+
 
         function animateNumber(
             elementId,
@@ -3084,12 +3944,30 @@
                     elementId
                 );
 
-            if (!element) return;
+
+            if (!element)
+                return;
+
+
+            if (
+                numberAnimations[elementId]
+            ) {
+
+                cancelAnimationFrame(
+                    numberAnimations[elementId]
+                );
+
+                numberAnimations[elementId] =
+                    null;
+
+            }
 
 
             const startValue =
                 Number(
                     element.dataset.value ||
+                    element.textContent
+                        .replace(/,/g, "") ||
                     0
                 );
 
@@ -3110,7 +3988,11 @@
             }
 
 
-            const duration = 450;
+            const duration =
+                performanceMode.mobile
+                    ? 220
+                    : 350;
+
 
             const startTime =
                 performance.now();
@@ -3125,13 +4007,14 @@
                         1
                     );
 
-                // Ease-out for a natural
-                // deceleration into place.
+
                 const eased =
-                    1 - Math.pow(
+                    1 -
+                    Math.pow(
                         1 - progress,
                         3
                     );
+
 
                 const current =
                     Math.round(
@@ -3139,22 +4022,30 @@
                         (
                             targetValue -
                             startValue
-                        ) * eased
+                        ) *
+                        eased
                     );
+
 
                 element.textContent =
                     current.toLocaleString();
 
 
-                if (progress < 1) {
+                if (
+                    progress < 1
+                ) {
 
-                    requestAnimationFrame(
-                        tick
-                    );
+                    numberAnimations[elementId] =
+                        requestAnimationFrame(
+                            tick
+                        );
 
                 }
 
                 else {
+
+                    numberAnimations[elementId] =
+                        null;
 
                     element.dataset.value =
                         targetValue;
@@ -3164,7 +4055,10 @@
             }
 
 
-            requestAnimationFrame(tick);
+            numberAnimations[elementId] =
+                requestAnimationFrame(
+                    tick
+                );
 
         }
 
@@ -3176,90 +4070,101 @@
         function updateLevelButtons() {
 
             document
-                .querySelectorAll(".level-button")
-                .forEach(button => {
+                .querySelectorAll(
+                    ".level-button"
+                )
+                .forEach(
+                    button => {
 
-                    const level =
-                        Number(
-                            button.dataset.level
-                        );
-
-
-                    button.classList.remove(
-                        "selected"
-                    );
+                        const level =
+                            Number(
+                                button.dataset.level
+                            );
 
 
-                    if (
-                        level ===
-                        currentLevel
-                    ) {
-
-                        button.classList.add(
+                        button.classList.remove(
                             "selected"
                         );
 
-                    }
+
+                        if (
+                            level ===
+                            currentLevel
+                        ) {
+
+                            button.classList.add(
+                                "selected"
+                            );
+
+                        }
 
 
-                    if (
-                        level <=
-                        save.unlockedLevel
-                    ) {
+                        if (
+                            level <=
+                            save.unlockedLevel
+                        ) {
 
-                        button.classList.remove(
-                            "locked"
-                        );
-
-
-                        const icon =
-                            button.querySelector(
-                                ".level-icon"
+                            button.classList.remove(
+                                "locked"
                             );
 
 
-                        if (icon) {
+                            const icon =
+                                button.querySelector(
+                                    ".level-icon"
+                                );
 
-                            icon.textContent =
-                                level ===
-                                currentLevel
-                                    ? "⚡"
-                                    : "✓";
+
+                            if (icon) {
+
+                                icon.textContent =
+                                    level ===
+                                    currentLevel
+                                        ? "⚡"
+                                        : "✓";
+
+                            }
+
+                        }
+
+                        else {
+
+                            button.classList.add(
+                                "locked"
+                            );
+
+
+                            const icon =
+                                button.querySelector(
+                                    ".level-icon"
+                                );
+
+
+                            if (icon) {
+
+                                icon.textContent =
+                                    "🔒";
+
+                            }
 
                         }
 
                     }
-
-                    else {
-
-                        button.classList.add(
-                            "locked"
-                        );
-
-                        const icon =
-                            button.querySelector(
-                                ".level-icon"
-                            );
+                );
 
 
-                        if (icon) {
-
-                            icon.textContent =
-                                "🔒";
-
-                        }
-
-                    }
-
-                });
-
-
-            document
-                .getElementById(
+            const counter =
+                document.getElementById(
                     "levelCounter"
-                )
-                .textContent =
+                );
+
+
+            if (counter) {
+
+                counter.textContent =
                     `${save.unlockedLevel} / 8`;
+
+            }
 
         }
 
@@ -3298,11 +4203,8 @@
                 shopItems[itemName];
 
 
-            if (!item) {
-
+            if (!item)
                 return;
-
-            }
 
 
             if (
@@ -3328,6 +4230,7 @@
                     "🪙",
                     "Not enough coins!"
                 );
+
 
                 playWrongSound();
 
@@ -3357,6 +4260,7 @@
                     `${itemName}Button`
                 );
 
+
             const shopItemCard =
                 purchasedButton
                     ? purchasedButton.closest(
@@ -3364,13 +4268,16 @@
                     )
                     : null;
 
+
             if (shopItemCard) {
 
                 shopItemCard.classList.remove(
                     "purchase-animation"
                 );
 
+
                 void shopItemCard.offsetWidth;
+
 
                 shopItemCard.classList.add(
                     "purchase-animation"
@@ -3390,60 +4297,73 @@
         function updateShop() {
 
             Object.keys(shopItems)
-                .forEach(itemName => {
+                .forEach(
+                    itemName => {
 
-                    const status =
-                        document.getElementById(
-                            `${itemName}Status`
-                        );
-
-                    const button =
-                        document.getElementById(
-                            `${itemName}Button`
-                        );
+                        const status =
+                            document.getElementById(
+                                `${itemName}Status`
+                            );
 
 
-                    if (
-                        save.items[itemName]
-                    ) {
-
-                        status.textContent =
-                            "✓ UNLOCKED";
+                        const button =
+                            document.getElementById(
+                                `${itemName}Button`
+                            );
 
 
-                        status.classList.add(
-                            "unlocked"
-                        );
+                        if (
+                            !status ||
+                            !button
+                        ) return;
 
 
-                        button.textContent =
-                            "✓ OWNED";
+                        if (
+                            save.items[itemName]
+                        ) {
+
+                            status.textContent =
+                                "✓ UNLOCKED";
 
 
-                        button.disabled =
-                            true;
+                            status.classList.add(
+                                "unlocked"
+                            );
+
+
+                            button.textContent =
+                                "✓ OWNED";
+
+
+                            button.disabled =
+                                true;
+
+                        }
+
+                        else {
+
+                            status.textContent =
+                                "Locked";
+
+
+                            status.classList.remove(
+                                "unlocked"
+                            );
+
+
+                            button.textContent =
+                                `🪙 ${shopItems[itemName].cost}`;
+
+
+                            button.disabled =
+                                save.coins <
+                                shopItems[itemName]
+                                    .cost;
+
+                        }
 
                     }
-
-                    else {
-
-                        status.textContent =
-                            "Locked";
-
-
-                        status.classList.remove(
-                            "unlocked"
-                        );
-
-
-                        button.disabled =
-                            save.coins <
-                            shopItems[itemName]
-                                .cost;
-
-                    }
-
-                });
+                );
 
         }
 
@@ -3691,30 +4611,36 @@
 
 
             Object.keys(map)
-                .forEach(name => {
+                .forEach(
+                    name => {
 
-                    const element =
-                        document.getElementById(
-                            map[name]
-                        );
+                        const element =
+                            document.getElementById(
+                                map[name]
+                            );
 
 
-                    if (
-                        save.achievements
-                            .includes(name)
-                    ) {
+                        if (!element)
+                            return;
 
-                        element.classList.add(
-                            "unlocked-achievement"
-                        );
 
-                        element.classList.remove(
-                            "locked-achievement"
-                        );
+                        if (
+                            save.achievements
+                                .includes(name)
+                        ) {
+
+                            element.classList.add(
+                                "unlocked-achievement"
+                            );
+
+                            element.classList.remove(
+                                "locked-achievement"
+                            );
+
+                        }
 
                     }
-
-                });
+                );
 
         }
 
@@ -3736,7 +4662,7 @@
                     "newLevelNumber"
                 )
                 .textContent =
-                    `LEVEL ${level}`;
+                `LEVEL ${level}`;
 
 
             overlay.classList.remove(
@@ -3800,7 +4726,7 @@
                     "achievementTitle"
                 )
                 .textContent =
-                    achievement.title;
+                achievement.title;
 
 
             document
@@ -3808,7 +4734,7 @@
                     "achievementDescription"
                 )
                 .textContent =
-                    achievement.description;
+                achievement.description;
 
 
             overlay
@@ -3816,7 +4742,7 @@
                     ".overlay-reward"
                 )
                 .textContent =
-                    `🪙 +${achievement.reward} COINS`;
+                `🪙 +${achievement.reward} COINS`;
 
 
             overlay.classList.remove(
@@ -3884,7 +4810,7 @@
                     "toastIcon"
                 )
                 .textContent =
-                    icon;
+                icon;
 
 
             document
@@ -3892,7 +4818,7 @@
                     "toastMessage"
                 )
                 .textContent =
-                    message;
+                message;
 
 
             toast.classList.remove(
@@ -3931,6 +4857,7 @@
                     "usernameInput"
                 );
 
+
             const hint =
                 document.getElementById(
                     "usernameHint"
@@ -3941,7 +4868,9 @@
                 input.value.trim();
 
 
-            if (raw.length < 3) {
+            if (
+                raw.length < 3
+            ) {
 
                 hint.textContent =
                     "Username must be at least 3 characters.";
@@ -3973,9 +4902,12 @@
             }
 
 
-            save.username = raw;
+            save.username =
+                raw;
+
 
             saveGame();
+
 
             playClickSound();
 
@@ -3996,15 +4928,18 @@
                     "usernameCard"
                 );
 
+
             const hint =
                 document.getElementById(
                     "usernameHint"
                 );
 
+
             const youLabel =
                 document.getElementById(
                     "leaderboardYou"
                 );
+
 
             const input =
                 document.getElementById(
@@ -4012,21 +4947,31 @@
                 );
 
 
-            if (save.username) {
+            if (!card || !hint || !youLabel || !input)
+                return;
+
+
+            if (
+                save.username
+            ) {
 
                 input.value =
                     save.username;
+
 
                 card.classList.add(
                     "username-set"
                 );
 
+
                 hint.textContent =
                     `Playing as ${save.username}. `;
+
 
                 hint.classList.remove(
                     "hint-error"
                 );
+
 
                 youLabel.textContent =
                     `👤 ${save.username}`;
@@ -4039,7 +4984,9 @@
                     "username-set"
                 );
 
-                youLabel.textContent = "";
+
+                youLabel.textContent =
+                    "";
 
             }
 
@@ -4048,43 +4995,106 @@
 
         /* =================================================
            LEADERBOARD — SUBMIT SCORE
-
-           NOTE: this client-side check only stops
-           accidental/obvious bad values from being sent.
-           The real protection is the Firestore Security
-           Rule, which re-checks these same numbers on
-           Google's servers — that's the part a player
-           can't bypass by editing this page's code.
         ================================================== */
 
-        function submitScoreToLeaderboard() {
-            if (!firebaseReady || !currentUser || !save.username) return;
+        let leaderboardSubmitTimer = null;
 
-            const maxPlausibleCoins = Math.max(save.totalWins, 1) * 800;
+
+        function submitScoreToLeaderboard() {
+
             if (
-                save.coins < 0 ||
-                save.coins > maxPlausibleCoins ||
-                !Number.isInteger(save.coins)
+                !firebaseReady ||
+                !currentUser ||
+                !save.username
             ) return;
 
-            firestoreDB
-                .collection("leaderboard")
-                .doc(currentUser.uid)
-                .set({
-                    username: save.username,
-                    coins: save.coins,
-                    playerLevel: save.playerLevel,
-                    totalWins: save.totalWins,
-                    achievementsCount: save.achievements.length,
-                    ownerUid: currentUser.uid,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true })
-                .catch(error => console.error("Leaderboard submission failed:", error));
+
+            const maxPlausibleCoins =
+                Math.max(
+                    save.totalWins,
+                    1
+                ) * 800;
+
+
+            if (
+                save.coins < 0 ||
+                save.coins >
+                maxPlausibleCoins ||
+                !Number.isInteger(
+                    save.coins
+                )
+            ) return;
+
+
+            clearTimeout(
+                leaderboardSubmitTimer
+            );
+
+
+            leaderboardSubmitTimer =
+                setTimeout(
+                    async () => {
+
+                        try {
+
+                            await firestoreDB
+                                .collection(
+                                    "leaderboard"
+                                )
+                                .doc(
+                                    currentUser.uid
+                                )
+                                .set({
+
+                                    username:
+                                        save.username,
+
+                                    coins:
+                                        save.coins,
+
+                                    playerLevel:
+                                        save.playerLevel,
+
+                                    totalWins:
+                                        save.totalWins,
+
+                                    achievementsCount:
+                                        save.achievements.length,
+
+                                    ownerUid:
+                                        currentUser.uid,
+
+                                    updatedAt:
+                                        firebase.firestore
+                                            .FieldValue
+                                            .serverTimestamp()
+
+                                }, {
+                                    merge: true
+                                });
+
+                        }
+
+                        catch (error) {
+
+                            console.error(
+                                "Leaderboard submission failed:",
+                                error
+                            );
+
+                        }
+
+                    },
+                    performanceMode.mobile
+                        ? 800
+                        : 400
+                );
+
         }
 
 
         /* =================================================
-           LEADERBOARD — LOAD + RENDER
+           LEADERBOARD — LOAD
         ================================================== */
 
         let leaderboardLoading = false;
@@ -4093,51 +5103,75 @@
         function setLeaderboardState(state) {
 
             const states = [
+
                 "leaderboardLoading",
+
                 "leaderboardError",
+
                 "leaderboardEmpty"
+
             ];
 
 
-            states.forEach(id => {
+            states.forEach(
+                id => {
 
-                document
-                    .getElementById(id)
-                    .classList.add(
-                        "hidden"
-                    );
-
-            });
+                    const element =
+                        document.getElementById(
+                            id
+                        );
 
 
-            document
-                .getElementById(
+                    if (element) {
+
+                        element.classList.add(
+                            "hidden"
+                        );
+
+                    }
+
+                }
+            );
+
+
+            const list =
+                document.getElementById(
                     "leaderboardList"
-                )
-                .classList.add(
+                );
+
+
+            if (list) {
+
+                list.classList.add(
                     "hidden"
                 );
+
+            }
 
 
             if (state) {
 
-                document
-                    .getElementById(state)
-                    .classList.remove(
+                const element =
+                    document.getElementById(
+                        state
+                    );
+
+
+                if (element) {
+
+                    element.classList.remove(
                         "hidden"
                     );
+
+                }
 
             }
 
-            else {
+            else if (list) {
 
-                document
-                    .getElementById(
-                        "leaderboardList"
-                    )
-                    .classList.remove(
-                        "hidden"
-                    );
+                list.classList.remove(
+                    "hidden"
+                );
 
             }
 
@@ -4146,7 +5180,9 @@
 
         function loadLeaderboard() {
 
-            if (leaderboardLoading) return;
+            if (
+                leaderboardLoading
+            ) return;
 
 
             const refreshButton =
@@ -4166,9 +5202,14 @@
             }
 
 
-            leaderboardLoading = true;
+            leaderboardLoading =
+                true;
 
-            refreshButton.disabled = true;
+
+            if (refreshButton)
+                refreshButton.disabled =
+                    true;
+
 
             setLeaderboardState(
                 "leaderboardLoading"
@@ -4177,56 +5218,73 @@
 
             firestoreDB
                 .collection("leaderboard")
-                .orderBy("coins", "desc")
+                .orderBy(
+                    "coins",
+                    "desc"
+                )
                 .limit(50)
                 .get()
-                .then(snapshot => {
+                .then(
+                    snapshot => {
 
-                    const entries = [];
-
-
-                    snapshot.forEach(
-                        doc => {
-
-                            entries.push(
-                                doc.data()
-                            );
-
-                        }
-                    );
+                        const entries = [];
 
 
-                    renderLeaderboard(
-                        entries
-                    );
+                        snapshot.forEach(
+                            doc => {
 
-                })
-                .catch(error => {
+                                entries.push(
+                                    doc.data()
+                                );
 
-                    setLeaderboardState(
-                        "leaderboardError"
-                    );
+                            }
+                        );
 
-                })
-                .finally(() => {
 
-                    leaderboardLoading =
-                        false;
+                        renderLeaderboard(
+                            entries
+                        );
 
-                    refreshButton.disabled =
-                        false;
+                    }
+                )
+                .catch(
+                    error => {
 
-                });
+                        setLeaderboardState(
+                            "leaderboardError"
+                        );
+
+                    }
+                )
+                .finally(
+                    () => {
+
+                        leaderboardLoading =
+                            false;
+
+
+                        if (refreshButton)
+                            refreshButton.disabled =
+                                false;
+
+                    }
+                );
 
         }
 
 
-        function renderLeaderboard(entries) {
+        function renderLeaderboard(
+            entries
+        ) {
 
             const list =
                 document.getElementById(
                     "leaderboardList"
                 );
+
+
+            if (!list)
+                return;
 
 
             if (
@@ -4246,6 +5304,10 @@
             list.innerHTML = "";
 
 
+            const fragment =
+                document.createDocumentFragment();
+
+
             const medals =
                 ["🥇", "🥈", "🥉"];
 
@@ -4257,6 +5319,7 @@
                         document.createElement(
                             "div"
                         );
+
 
                     row.className =
                         "leaderboard-row";
@@ -4289,22 +5352,39 @@
                             : `#${index + 1}`;
 
 
+                    const rank =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    rank.className =
+                        "row-rank";
+
+
+                    rank.textContent =
+                        rankLabel;
+
+
+                    row.appendChild(
+                        rank
+                    );
+
+
                     const safeName =
                         document.createElement(
                             "span"
                         );
 
+
                     safeName.className =
                         "row-username";
+
 
                     safeName.textContent =
                         entry.username ||
                         "???";
 
-
-                    row.innerHTML = `
-                        <span class="row-rank">${rankLabel}</span>
-                    `;
 
                     row.appendChild(
                         safeName
@@ -4316,20 +5396,55 @@
                             "span"
                         );
 
+
                     stats.className =
                         "row-stats";
 
-                    stats.innerHTML = `
-                        <span class="row-coins">🪙 ${(entry.coins || 0).toLocaleString()}</span>
-                        <span class="row-level">⚡ Lv ${entry.playerLevel || 1}</span>
-                    `;
+
+                    const coins =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    coins.className =
+                        "row-coins";
+
+
+                    coins.textContent =
+                        `🪙 ${(entry.coins || 0).toLocaleString()}`;
+
+
+                    const level =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    level.className =
+                        "row-level";
+
+
+                    level.textContent =
+                        `⚡ Lv ${entry.playerLevel || 1}`;
+
+
+                    stats.appendChild(
+                        coins
+                    );
+
+
+                    stats.appendChild(
+                        level
+                    );
+
 
                     row.appendChild(
                         stats
                     );
 
 
-                    list.appendChild(
+                    fragment.appendChild(
                         row
                     );
 
@@ -4337,7 +5452,14 @@
             );
 
 
-            setLeaderboardState(null);
+            list.appendChild(
+                fragment
+            );
+
+
+            setLeaderboardState(
+                null
+            );
 
         }
 
@@ -4346,9 +5468,15 @@
            ENTER KEY
         ================================================== */
 
-        document
-            .getElementById("guess")
-            .addEventListener(
+        const guessInput =
+            document.getElementById(
+                "guess"
+            );
+
+
+        if (guessInput) {
+
+            guessInput.addEventListener(
                 "keydown",
                 function(event) {
 
@@ -4363,6 +5491,8 @@
 
                 }
             );
+
+        }
 
 
         /* =================================================
@@ -4402,24 +5532,83 @@
 
         updateLevelButtons();
 
-        startLevel();
+
+        /*
+         * IMPORTANT:
+         *
+         * Do NOT call startLevel() here.
+         *
+         * Firebase loads the player's account first,
+         * then unlockGame() starts the level.
+         *
+         * This avoids doing game work before authentication
+         * and prevents the initial game state from being
+         * overwritten by the cloud save.
+         */
 
 
-            const loginGameIdInput = document.getElementById("loginGameId");
+        /* =================================================
+           LOGIN INPUT FORMATTING
+        ================================================== */
+
+        const loginGameIdInput =
+            document.getElementById(
+                "loginGameId"
+            );
+
+
         if (loginGameIdInput) {
-            loginGameIdInput.addEventListener("input", e => {
-                e.target.value = normalizeGameId(e.target.value);
-            });
+
+            loginGameIdInput.addEventListener(
+                "input",
+                e => {
+
+                    e.target.value =
+                        normalizeGameId(
+                            e.target.value
+                        );
+
+                }
+            );
+
         }
 
-        const recoveryInput = document.getElementById("loginRecoveryCode");
+
+        const recoveryInput =
+            document.getElementById(
+                "loginRecoveryCode"
+            );
+
+
         if (recoveryInput) {
-            recoveryInput.addEventListener("input", e => {
-                const raw = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
-                e.target.value = raw.match(/.{1,4}/g)?.join("-") || "";
-            });
-        }
 
+            recoveryInput.addEventListener(
+                "input",
+                e => {
+
+                    const raw =
+                        e.target.value
+                            .toUpperCase()
+                            .replace(
+                                /[^A-Z0-9]/g,
+                                ""
+                            )
+                            .slice(
+                                0,
+                                12
+                            );
+
+
+                    e.target.value =
+                        raw.match(
+                            /.{1,4}/g
+                        )?.join("-") ||
+                        "";
+
+                }
+            );
+
+        }
 
     </script>
 
