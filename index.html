@@ -172,6 +172,75 @@
             opacity: .75;
             margin-top: 6px;
         }
+
+        .home-tiles {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 8px 4px 4px;
+        }
+
+        @media (min-width: 640px) {
+
+            .home-tiles {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+        }
+
+        .home-tile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 32px 16px;
+            border-radius: 24px;
+            border: 1px solid rgba(120, 170, 255, .25);
+            background: rgba(10, 16, 35, .85);
+            color: inherit;
+            font-family: inherit;
+            cursor: pointer;
+            text-align: center;
+            transition: transform .15s ease, border-color .15s ease;
+        }
+
+        .home-tile:active {
+            transform: scale(.96);
+            border-color: rgba(100, 170, 255, .8);
+        }
+
+        .home-tile-icon {
+            font-size: 2.6rem;
+        }
+
+        .home-tile-label {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .home-tile-sub {
+            font-size: .8rem;
+            opacity: .7;
+        }
+
+        .section-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 16px;
+        }
+
+        .section-back {
+            width: auto;
+            flex: 0 0 auto;
+        }
+
+        .section-bar-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            opacity: .85;
+        }
     </style>
 
 </head>
@@ -445,51 +514,26 @@
         </header>
 
 
-        <!-- NAVIGATION -->
+        <!-- SECTION BAR (shown once inside a section, hidden on the main menu) -->
 
-        <nav class="navigation">
-
-            <button
-                class="nav-button active"
-                data-screen="gameScreen"
-                onclick="showScreen('gameScreen')"
-            >
-                🎮 Game
-            </button>
+        <div
+            id="sectionBar"
+            class="section-bar hidden-auth"
+        >
 
             <button
-                class="nav-button"
-                data-screen="shopScreen"
-                onclick="showScreen('shopScreen')"
+                class="secondary-button section-back"
+                onclick="showScreen('homeScreen')"
             >
-                🛒 Shop
+                ← Menu
             </button>
 
-            <button
-                class="nav-button"
-                data-screen="duelScreen"
-                onclick="showScreen('duelScreen')"
-            >
-                ⚔️ Duels
-            </button>
+            <span
+                id="sectionBarTitle"
+                class="section-bar-title"
+            ></span>
 
-            <button
-                class="nav-button"
-                data-screen="profileScreen"
-                onclick="showScreen('profileScreen')"
-            >
-                🏆 Profile
-            </button>
-
-            <button
-                class="nav-button"
-                data-screen="leaderboardScreen"
-                onclick="showScreen('leaderboardScreen')"
-            >
-                🌐 Leaderboard
-            </button>
-
-        </nav>
+        </div>
 
 
         <!-- =====================================================
@@ -499,11 +543,79 @@
         <section class="screens">
 
 
+            <!-- MAIN MENU -->
+
+            <section
+                id="homeScreen"
+                class="screen active-screen"
+            >
+
+                <div class="home-tiles">
+
+                    <button
+                        class="home-tile"
+                        onclick="showScreen('gameScreen')"
+                    >
+                        <span class="home-tile-icon">🎮</span>
+                        <span class="home-tile-label">Game</span>
+                        <span class="home-tile-sub">Guess the number</span>
+                    </button>
+
+                    <button
+                        class="home-tile"
+                        onclick="showScreen('leaderboardScreen')"
+                    >
+                        <span class="home-tile-icon">🏆</span>
+                        <span class="home-tile-label">Leaderboard</span>
+                        <span class="home-tile-sub">Global rankings</span>
+                    </button>
+
+                    <button
+                        class="home-tile"
+                        onclick="showScreen('duelScreen')"
+                    >
+                        <span class="home-tile-icon">⚔️</span>
+                        <span class="home-tile-label">Duels</span>
+                        <span class="home-tile-sub">1v1 for coins</span>
+                    </button>
+
+                    <button
+                        class="home-tile"
+                        onclick="showScreen('shopScreen')"
+                    >
+                        <span class="home-tile-icon">🛒</span>
+                        <span class="home-tile-label">Shop</span>
+                        <span class="home-tile-sub">Upgrades & power-ups</span>
+                    </button>
+
+                    <button
+                        class="home-tile"
+                        onclick="showScreen('profileScreen')"
+                    >
+                        <span class="home-tile-icon">👤</span>
+                        <span class="home-tile-label">Profile</span>
+                        <span class="home-tile-sub">Stats & progress</span>
+                    </button>
+
+                    <button
+                        class="home-tile"
+                        onclick="showScreen('achievementsScreen')"
+                    >
+                        <span class="home-tile-icon">🏅</span>
+                        <span class="home-tile-label">Achievements</span>
+                        <span class="home-tile-sub">Milestones & rewards</span>
+                    </button>
+
+                </div>
+
+            </section>
+
+
             <!-- GAME SCREEN -->
 
             <section
                 id="gameScreen"
-                class="screen active-screen"
+                class="screen"
             >
 
                 <div class="panel game-panel">
@@ -1378,7 +1490,7 @@
                             PLAYER DATA
                         </span>
 
-                        <h2>🏆 Profile</h2>
+                        <h2>👤 Profile</h2>
 
                         <p>
                             Track your progress and achievements.
@@ -1459,23 +1571,37 @@
 
                     </div>
 
+                </div>
+
+            </section>
+
+
+            <!-- ACHIEVEMENTS -->
+
+            <section
+                id="achievementsScreen"
+                class="screen"
+            >
+
+                <div class="panel achievements-panel">
+
+                    <div class="screen-heading">
+
+                        <span class="eyebrow">
+                            MILESTONES
+                        </span>
+
+                        <h2>🏅 Achievements</h2>
+
+                        <p>
+                            Unlock these by playing, buying
+                            upgrades, and winning duels.
+                        </p>
+
+                    </div>
+
 
                     <div class="achievements-section">
-
-                        <div class="section-title">
-
-                            <div>
-
-                                <span class="eyebrow">
-                                    MILESTONES
-                                </span>
-
-                                <h3>🏆 Achievements</h3>
-
-                            </div>
-
-                        </div>
-
 
                         <div class="achievement-grid">
 
@@ -1646,7 +1772,7 @@
                             GLOBAL RANKINGS
                         </span>
 
-                        <h2>🌐 Leaderboard</h2>
+                        <h2>🏆 Leaderboard</h2>
 
                         <p>
                             See how you stack up against players worldwide.
@@ -3792,6 +3918,23 @@
         }
 
 
+        const SECTION_TITLES = {
+
+            gameScreen: "🎮 Game",
+
+            shopScreen: "🛒 Shop",
+
+            duelScreen: "⚔️ Duels",
+
+            profileScreen: "👤 Profile",
+
+            achievementsScreen: "🏅 Achievements",
+
+            leaderboardScreen: "🏆 Leaderboard"
+
+        };
+
+
         function showScreen(screenId) {
 
             document
@@ -3801,19 +3944,6 @@
 
                         screen.classList.remove(
                             "active-screen"
-                        );
-
-                    }
-                );
-
-
-            document
-                .querySelectorAll(".nav-button")
-                .forEach(
-                    button => {
-
-                        button.classList.remove(
-                            "active"
                         );
 
                     }
@@ -3835,17 +3965,50 @@
             }
 
 
-            const navButton =
-                document.querySelector(
-                    `.nav-button[data-screen="${screenId}"]`
+            const sectionBar =
+                document.getElementById(
+                    "sectionBar"
+                );
+
+            const sectionBarTitle =
+                document.getElementById(
+                    "sectionBarTitle"
                 );
 
 
-            if (navButton) {
+            if (
+                screenId ===
+                "homeScreen"
+            ) {
 
-                navButton.classList.add(
-                    "active"
-                );
+                if (sectionBar) {
+
+                    sectionBar.classList.add(
+                        "hidden-auth"
+                    );
+
+                }
+
+            }
+
+            else {
+
+                if (sectionBar) {
+
+                    sectionBar.classList.remove(
+                        "hidden-auth"
+                    );
+
+                }
+
+
+                if (sectionBarTitle) {
+
+                    sectionBarTitle.textContent =
+                        SECTION_TITLES[screenId] ||
+                        "";
+
+                }
 
             }
 
