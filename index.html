@@ -122,6 +122,56 @@
         .auth-locked {
             display: none !important;
         }
+
+        .hints-area {
+            display: grid;
+            gap: 6px;
+            margin: 4px 0 14px;
+        }
+
+        .hint-line {
+            font-size: .85rem;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: rgba(120, 170, 255, .08);
+            border: 1px solid rgba(120, 170, 255, .2);
+        }
+
+        .power-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 0 0 14px;
+        }
+
+        .power-button {
+            flex: 1 1 auto;
+            min-width: 100px;
+        }
+
+        .duel-range-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .duel-create,
+        .duel-join {
+            margin: 18px 0;
+        }
+
+        .duel-center {
+            text-align: center;
+        }
+
+        .duel-icon {
+            font-size: 3rem;
+        }
+
+        .duel-opponent-note {
+            display: block;
+            font-size: .85rem;
+            opacity: .75;
+            margin-top: 6px;
+        }
     </style>
 
 </head>
@@ -417,6 +467,14 @@
 
             <button
                 class="nav-button"
+                data-screen="duelScreen"
+                onclick="showScreen('duelScreen')"
+            >
+                ⚔️ Duels
+            </button>
+
+            <button
+                class="nav-button"
                 data-screen="profileScreen"
                 onclick="showScreen('profileScreen')"
             >
@@ -503,6 +561,18 @@
                         <p id="gameMessage">
                             Choose a level to begin!
                         </p>
+
+
+                        <div
+                            id="hintsArea"
+                            class="hints-area"
+                        ></div>
+
+
+                        <div
+                            id="powerActions"
+                            class="power-actions"
+                        ></div>
 
 
                         <div class="guess-area">
@@ -835,6 +905,457 @@
 
                         </article>
 
+
+                        <article class="shop-item">
+
+                            <div class="shop-icon">🔍</div>
+
+                            <div class="shop-info">
+
+                                <h3>Number Scanner</h3>
+
+                                <p>
+                                    Once per game, reveal a smaller range containing the secret number.
+                                </p>
+
+                                <span
+                                    class="item-status"
+                                    id="numberScannerStatus"
+                                >
+                                    Locked
+                                </span>
+
+                            </div>
+
+                            <button
+                                class="shop-buy"
+                                id="numberScannerButton"
+                                onclick="buyItem('numberScanner')"
+                            >
+                                🪙 200
+                            </button>
+
+                        </article>
+
+
+                        <article class="shop-item">
+
+                            <div class="shop-icon">🧠</div>
+
+                            <div class="shop-info">
+
+                                <h3>Smart Hint</h3>
+
+                                <p>
+                                    Once per game, reveal a useful clue about the secret number.
+                                </p>
+
+                                <span
+                                    class="item-status"
+                                    id="smartHintStatus"
+                                >
+                                    Locked
+                                </span>
+
+                            </div>
+
+                            <button
+                                class="shop-buy"
+                                id="smartHintButton"
+                                onclick="buyItem('smartHint')"
+                            >
+                                🪙 350
+                            </button>
+
+                        </article>
+
+
+                        <article class="shop-item">
+
+                            <div class="shop-icon">🛡️</div>
+
+                            <div class="shop-info">
+
+                                <h3>Shield</h3>
+
+                                <p>
+                                    Once per game, block one wrong guess from costing a life.
+                                </p>
+
+                                <span
+                                    class="item-status"
+                                    id="shieldStatus"
+                                >
+                                    Locked
+                                </span>
+
+                            </div>
+
+                            <button
+                                class="shop-buy"
+                                id="shieldButton"
+                                onclick="buyItem('shield')"
+                            >
+                                🪙 400
+                            </button>
+
+                        </article>
+
+
+                        <article class="shop-item">
+
+                            <div class="shop-icon">❤️</div>
+
+                            <div class="shop-info">
+
+                                <h3>Second Chance</h3>
+
+                                <p>
+                                    If you hit 0 lives, automatically get 3 extra lives once per game.
+                                </p>
+
+                                <span
+                                    class="item-status"
+                                    id="secondChanceStatus"
+                                >
+                                    Locked
+                                </span>
+
+                            </div>
+
+                            <button
+                                class="shop-buy"
+                                id="secondChanceButton"
+                                onclick="buyItem('secondChance')"
+                            >
+                                🪙 500
+                            </button>
+
+                        </article>
+
+
+                        <article class="shop-item">
+
+                            <div class="shop-icon">🎯</div>
+
+                            <div class="shop-info">
+
+                                <h3>Precision Boost</h3>
+
+                                <p>
+                                    Start every game with a narrowed range containing the secret number.
+                                </p>
+
+                                <span
+                                    class="item-status"
+                                    id="precisionBoostStatus"
+                                >
+                                    Locked
+                                </span>
+
+                            </div>
+
+                            <button
+                                class="shop-buy"
+                                id="precisionBoostButton"
+                                onclick="buyItem('precisionBoost')"
+                            >
+                                🪙 600
+                            </button>
+
+                        </article>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- DUELS -->
+
+            <section
+                id="duelScreen"
+                class="screen"
+            >
+
+                <div class="panel duel-panel">
+
+                    <div class="screen-heading">
+
+                        <span class="eyebrow">
+                            HEAD TO HEAD
+                        </span>
+
+                        <h2>⚔️ 1v1 Duels</h2>
+
+                        <p>
+                            Wager 🪙 100. First to guess right
+                            takes the 🪙 200 pot.
+                        </p>
+
+                    </div>
+
+
+                    <!-- LOBBY -->
+
+                    <div id="duelLobby">
+
+                        <div class="shop-balance">
+                            🪙 <strong id="duelCoins">0</strong> coins
+                        </div>
+
+
+                        <div class="duel-create">
+
+                            <span class="eyebrow">
+                                CREATE A DUEL
+                            </span>
+
+                            <div class="level-grid duel-range-grid">
+
+                                <button
+                                    class="level-button"
+                                    onclick="createDuel(100)"
+                                >
+                                    <span class="level-icon">⚡</span>
+                                    <strong>Quick</strong>
+                                    <small>1 – 100</small>
+                                </button>
+
+                                <button
+                                    class="level-button"
+                                    onclick="createDuel(1000)"
+                                >
+                                    <span class="level-icon">🔥</span>
+                                    <strong>Standard</strong>
+                                    <small>1 – 1,000</small>
+                                </button>
+
+                                <button
+                                    class="level-button"
+                                    onclick="createDuel(10000)"
+                                >
+                                    <span class="level-icon">💀</span>
+                                    <strong>Extreme</strong>
+                                    <small>1 – 10,000</small>
+                                </button>
+
+                            </div>
+
+                            <div class="auth-note">
+                                Entry fee: 🪙 100 · Winner takes 🪙 200
+                            </div>
+
+                        </div>
+
+
+                        <div class="duel-join">
+
+                            <span class="eyebrow">
+                                JOIN A DUEL
+                            </span>
+
+                            <div class="username-row">
+
+                                <input
+                                    type="text"
+                                    id="duelCodeInput"
+                                    placeholder="Enter code"
+                                    maxlength="6"
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                >
+
+                                <button
+                                    class="primary-button"
+                                    onclick="joinDuelByCode()"
+                                >
+                                    JOIN
+                                </button>
+
+                            </div>
+
+                            <small
+                                class="username-hint"
+                                id="duelJoinHint"
+                            ></small>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- WAITING ROOM -->
+
+                    <div
+                        id="duelWaiting"
+                        class="hidden-auth"
+                    >
+
+                        <div class="credential-box">
+
+                            <strong>DUEL CODE</strong>
+
+                            <div
+                                id="duelWaitingCode"
+                                class="credential-value"
+                            ></div>
+
+                        </div>
+
+
+                        <div class="auth-actions">
+
+                            <button
+                                class="secondary-button"
+                                onclick="copyDuelCode()"
+                            >
+                                📋 Copy Code
+                            </button>
+
+                            <button
+                                class="secondary-button"
+                                onclick="copyDuelLink()"
+                            >
+                                🔗 Copy Link
+                            </button>
+
+                        </div>
+
+
+                        <p
+                            class="auth-note"
+                            id="duelWaitingStatus"
+                        >
+                            Waiting for an opponent…
+                        </p>
+
+
+                        <button
+                            class="secondary-button"
+                            onclick="cancelDuel()"
+                        >
+                            ✕ Cancel Duel
+                        </button>
+
+                    </div>
+
+
+                    <!-- ACTIVE DUEL -->
+
+                    <div
+                        id="duelActive"
+                        class="hidden-auth"
+                    >
+
+                        <div class="game-status">
+
+                            <div class="status-item">
+                                <span>🪙</span>
+                                <div>
+                                    <small>Pot</small>
+                                    <strong id="duelPot">200</strong>
+                                </div>
+                            </div>
+
+                            <div class="status-item">
+                                <span>🔢</span>
+                                <div>
+                                    <small>You</small>
+                                    <strong id="duelMyAttempts">0</strong>
+                                </div>
+                            </div>
+
+                            <div class="status-item">
+                                <span>👤</span>
+                                <div>
+                                    <small>Opponent</small>
+                                    <strong id="duelOpponentAttempts">0</strong>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <p id="duelMessage"></p>
+
+                        <small
+                            id="duelOpponentNote"
+                            class="duel-opponent-note"
+                        ></small>
+
+
+                        <div
+                            id="duelHintsArea"
+                            class="hints-area"
+                        ></div>
+
+
+                        <div class="guess-area">
+
+                            <input
+                                type="number"
+                                id="duelGuess"
+                                placeholder="Your guess"
+                                autocomplete="off"
+                            >
+
+                            <button
+                                id="duelGuessButton"
+                                class="primary-button"
+                                onclick="submitDuelGuess()"
+                            >
+                                GUESS
+                            </button>
+
+                        </div>
+
+
+                        <div
+                            id="duelResult"
+                            class="result"
+                            aria-live="polite"
+                        ></div>
+
+
+                        <div
+                            id="duelTimeoutAction"
+                            class="power-actions"
+                        ></div>
+
+                    </div>
+
+
+                    <!-- FINISHED -->
+
+                    <div
+                        id="duelFinished"
+                        class="hidden-auth"
+                    >
+
+                        <div
+                            id="duelFinishedIcon"
+                            class="duel-icon duel-center"
+                        ></div>
+
+                        <h2
+                            id="duelFinishedTitle"
+                            class="duel-center"
+                        ></h2>
+
+                        <p
+                            id="duelFinishedMessage"
+                            class="duel-center"
+                        ></p>
+
+                        <button
+                            class="primary-button"
+                            onclick="showDuelLobby()"
+                        >
+                            ⚔️ BACK TO DUELS
+                        </button>
+
                     </div>
 
                 </div>
@@ -932,7 +1453,7 @@
                             <span>🏆</span>
                             <small>Achievements</small>
                             <strong id="achievementCount">
-                                0 / 6
+                                0 / 12
                             </strong>
                         </div>
 
@@ -1026,6 +1547,78 @@
                                 <div>
                                     <strong>On Fire</strong>
                                     <small>Win 5 games</small>
+                                </div>
+                            </div>
+
+
+                            <div
+                                class="achievement locked-achievement"
+                                id="achievementOneShot"
+                            >
+                                <span>🎯</span>
+                                <div>
+                                    <strong>One Shot</strong>
+                                    <small>Win a game on your first guess</small>
+                                </div>
+                            </div>
+
+
+                            <div
+                                class="achievement locked-achievement"
+                                id="achievementProtected"
+                            >
+                                <span>🛡️</span>
+                                <div>
+                                    <strong>Protected</strong>
+                                    <small>Successfully use the Shield</small>
+                                </div>
+                            </div>
+
+
+                            <div
+                                class="achievement locked-achievement"
+                                id="achievementDetective"
+                            >
+                                <span>🔍</span>
+                                <div>
+                                    <strong>Detective</strong>
+                                    <small>Use Number Scanner and win</small>
+                                </div>
+                            </div>
+
+
+                            <div
+                                class="achievement locked-achievement"
+                                id="achievementLuckyBreak"
+                            >
+                                <span>🍀</span>
+                                <div>
+                                    <strong>Lucky Break</strong>
+                                    <small>Use Lucky Number and win</small>
+                                </div>
+                            </div>
+
+
+                            <div
+                                class="achievement locked-achievement"
+                                id="achievementAgainstOdds"
+                            >
+                                <span>❤️</span>
+                                <div>
+                                    <strong>Against the Odds</strong>
+                                    <small>Win after activating Second Chance</small>
+                                </div>
+                            </div>
+
+
+                            <div
+                                class="achievement locked-achievement"
+                                id="achievementPrecisionMaster"
+                            >
+                                <span>🎯</span>
+                                <div>
+                                    <strong>Precision Master</strong>
+                                    <small>Win a game while Precision Boost is active</small>
                                 </div>
                             </div>
 
@@ -1934,6 +2527,33 @@
 
             startLevel();
 
+
+            if (pendingDuelCode) {
+
+                showScreen(
+                    "duelScreen"
+                );
+
+
+                const codeInput =
+                    document.getElementById(
+                        "duelCodeInput"
+                    );
+
+
+                if (codeInput) {
+
+                    codeInput.value =
+                        pendingDuelCode;
+
+                }
+
+
+                pendingDuelCode =
+                    null;
+
+            }
+
         }
 
 
@@ -2089,7 +2709,17 @@
 
                 luckyNumber: false,
 
-                xpBoost: false
+                xpBoost: false,
+
+                numberScanner: false,
+
+                smartHint: false,
+
+                shield: false,
+
+                secondChance: false,
+
+                precisionBoost: false
 
             }
 
@@ -2179,6 +2809,19 @@
         let levelUpTimer = null;
 
         let achievementTimer = null;
+
+
+        /* =================================================
+           PER-GAME ITEM USAGE (reset every startLevel)
+        ================================================== */
+
+        let scannerUsedThisGame = false;
+
+        let hintUsedThisGame = false;
+
+        let shieldUsedThisGame = false;
+
+        let secondChanceUsedThisGame = false;
 
 
         /* =================================================
@@ -3280,6 +3923,15 @@
             attempts = 0;
 
 
+            scannerUsedThisGame = false;
+
+            hintUsedThisGame = false;
+
+            shieldUsedThisGame = false;
+
+            secondChanceUsedThisGame = false;
+
+
             lives =
                 level.lives;
 
@@ -3366,6 +4018,14 @@
             }
 
 
+            renderStartHints(
+                level.maximum
+            );
+
+
+            updatePowerActions();
+
+
             playSound(
                 440,
                 0.07
@@ -3445,13 +4105,40 @@
             }
 
 
-            lives--;
+            let shieldBlocked = false;
 
 
-            document
-                .getElementById("lives")
-                .textContent =
-                lives;
+            if (
+                save.items.shield &&
+                !shieldUsedThisGame
+            ) {
+
+                shieldUsedThisGame = true;
+
+                shieldBlocked = true;
+
+                unlockAchievement(
+                    "protected"
+                );
+
+                showToast(
+                    "🛡️",
+                    "Shield blocked the damage!"
+                );
+
+            }
+
+            else {
+
+                lives--;
+
+
+                document
+                    .getElementById("lives")
+                    .textContent =
+                    lives;
+
+            }
 
 
             playWrongSound();
@@ -3463,14 +4150,18 @@
             ) {
 
                 result.textContent =
-                    "📉 Too low!";
+                    shieldBlocked
+                        ? "🛡️ SHIELD BLOCKED THE DAMAGE! 📉 Too low!"
+                        : "📉 Too low!";
 
             }
 
             else {
 
                 result.textContent =
-                    "📈 Too high!";
+                    shieldBlocked
+                        ? "🛡️ SHIELD BLOCKED THE DAMAGE! 📈 Too high!"
+                        : "📈 Too high!";
 
             }
 
@@ -3502,6 +4193,46 @@
 
 
             if (lives <= 0) {
+
+                if (
+                    save.items.secondChance &&
+                    !secondChanceUsedThisGame
+                ) {
+
+                    secondChanceUsedThisGame = true;
+
+                    lives = 3;
+
+
+                    document
+                        .getElementById("lives")
+                        .textContent =
+                        lives;
+
+
+                    result.textContent =
+                        "❤️ SECOND CHANCE! +3 LIVES";
+
+
+                    showToast(
+                        "❤️",
+                        "Second Chance! +3 lives"
+                    );
+
+
+                    if (
+                        !performanceMode.mobile
+                    ) {
+
+                        input.focus();
+
+                    }
+
+
+                    return;
+
+                }
+
 
                 handleGameOver();
 
@@ -3802,6 +4533,9 @@
                 .getElementById("guessButton")
                 .disabled = true;
 
+
+            updatePowerActions();
+
         }
 
 
@@ -3870,6 +4604,11 @@
             );
 
             animateNumber(
+                "duelCoins",
+                save.coins
+            );
+
+            animateNumber(
                 "profileCoins",
                 save.coins
             );
@@ -3900,7 +4639,7 @@
                     "achievementCount"
                 )
                 .textContent =
-                `${save.achievements.length} / 6`;
+                `${save.achievements.length} / 12`;
 
 
             const xpIntoLevel =
@@ -4071,7 +4810,7 @@
 
             document
                 .querySelectorAll(
-                    ".level-button"
+                    "#gameScreen .level-button"
                 )
                 .forEach(
                     button => {
@@ -4189,6 +4928,26 @@
 
             xpBoost: {
                 cost: 300
+            },
+
+            numberScanner: {
+                cost: 200
+            },
+
+            smartHint: {
+                cost: 350
+            },
+
+            shield: {
+                cost: 400
+            },
+
+            secondChance: {
+                cost: 500
+            },
+
+            precisionBoost: {
+                cost: 600
             }
 
         };
@@ -4369,6 +5128,378 @@
 
 
         /* =================================================
+           ACTIVE ITEMS — START-OF-GAME HINTS
+           (Lucky Number, Precision Boost)
+        ================================================== */
+
+        function getLuckyClue(number) {
+
+            if (number % 5 === 0) {
+
+                return "🍀 Lucky Number: The secret number is divisible by 5.";
+
+            }
+
+
+            if (number % 3 === 0) {
+
+                return "🍀 Lucky Number: The secret number is divisible by 3.";
+
+            }
+
+
+            if (number % 2 === 0) {
+
+                return "🍀 Lucky Number: The secret number is EVEN.";
+
+            }
+
+
+            return "🍀 Lucky Number: The secret number is ODD.";
+
+        }
+
+
+        function getNarrowedRange(
+            number,
+            maximum,
+            fraction
+        ) {
+
+            const spread =
+                Math.max(
+                    1,
+                    Math.floor(
+                        maximum * fraction
+                    )
+                );
+
+
+            let low =
+                number -
+                Math.floor(spread / 2);
+
+
+            let high =
+                number +
+                Math.ceil(spread / 2);
+
+
+            if (low < 1) {
+
+                high += (1 - low);
+
+                low = 1;
+
+            }
+
+
+            if (high > maximum) {
+
+                low -= (high - maximum);
+
+                high = maximum;
+
+            }
+
+
+            low = Math.max(1, low);
+
+            high = Math.min(maximum, high);
+
+
+            return { low, high };
+
+        }
+
+
+        function addHintLine(text) {
+
+            const hintsArea =
+                document.getElementById(
+                    "hintsArea"
+                );
+
+
+            if (!hintsArea)
+                return;
+
+
+            const line =
+                document.createElement(
+                    "div"
+                );
+
+
+            line.className =
+                "hint-line";
+
+
+            line.textContent =
+                text;
+
+
+            hintsArea.appendChild(
+                line
+            );
+
+        }
+
+
+        function renderStartHints(
+            maximum
+        ) {
+
+            const hintsArea =
+                document.getElementById(
+                    "hintsArea"
+                );
+
+
+            if (!hintsArea)
+                return;
+
+
+            hintsArea.innerHTML =
+                "";
+
+
+            if (
+                save.items.luckyNumber
+            ) {
+
+                addHintLine(
+                    getLuckyClue(
+                        secretNumber
+                    )
+                );
+
+            }
+
+
+            if (
+                save.items.precisionBoost
+            ) {
+
+                const range =
+                    getNarrowedRange(
+                        secretNumber,
+                        maximum,
+                        0.5
+                    );
+
+
+                addHintLine(
+                    `🎯 Precision Target: ${range.low.toLocaleString()} – ${range.high.toLocaleString()}`
+                );
+
+            }
+
+        }
+
+
+        /* =================================================
+           ACTIVE ITEMS — POWER ACTIONS
+           (Number Scanner, Smart Hint)
+        ================================================== */
+
+        function updatePowerActions() {
+
+            const container =
+                document.getElementById(
+                    "powerActions"
+                );
+
+
+            if (!container)
+                return;
+
+
+            container.innerHTML =
+                "";
+
+
+            if (
+                save.items.numberScanner &&
+                !scannerUsedThisGame &&
+                gameActive
+            ) {
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                button.className =
+                    "secondary-button power-button";
+
+
+                button.textContent =
+                    "🔍 Scan";
+
+
+                button.onclick =
+                    useScanner;
+
+
+                container.appendChild(
+                    button
+                );
+
+            }
+
+
+            if (
+                save.items.smartHint &&
+                !hintUsedThisGame &&
+                gameActive
+            ) {
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                button.className =
+                    "secondary-button power-button";
+
+
+                button.textContent =
+                    "🧠 Hint";
+
+
+                button.onclick =
+                    useSmartHint;
+
+
+                container.appendChild(
+                    button
+                );
+
+            }
+
+        }
+
+
+        function useScanner() {
+
+            if (
+                !gameActive ||
+                scannerUsedThisGame
+            ) return;
+
+
+            scannerUsedThisGame =
+                true;
+
+
+            playClickSound();
+
+
+            const maximum =
+                levels[currentLevel]
+                    .maximum;
+
+
+            const range =
+                getNarrowedRange(
+                    secretNumber,
+                    maximum,
+                    0.25
+                );
+
+
+            addHintLine(
+                `🔍 Scanner: The number is between ${range.low.toLocaleString()} and ${range.high.toLocaleString()}`
+            );
+
+
+            updatePowerActions();
+
+        }
+
+
+        function useSmartHint() {
+
+            if (
+                !gameActive ||
+                hintUsedThisGame
+            ) return;
+
+
+            hintUsedThisGame =
+                true;
+
+
+            playClickSound();
+
+
+            const maximum =
+                levels[currentLevel]
+                    .maximum;
+
+
+            const clues = [
+
+                secretNumber % 2 === 0
+                    ? "🧠 The number is EVEN"
+                    : "🧠 The number is ODD"
+
+            ];
+
+
+            clues.push(
+                secretNumber >
+                maximum / 2
+                    ? "🧠 The number is in the upper half"
+                    : "🧠 The number is in the lower half"
+            );
+
+
+            if (
+                secretNumber % 5 === 0
+            ) {
+
+                clues.push(
+                    "🧠 The number is divisible by 5"
+                );
+
+            }
+
+
+            if (
+                secretNumber % 3 === 0
+            ) {
+
+                clues.push(
+                    "🧠 The number is divisible by 3"
+                );
+
+            }
+
+
+            const clueText =
+                clues[
+                    Math.floor(
+                        Math.random() *
+                        clues.length
+                    )
+                ];
+
+
+            addHintLine(
+                clueText
+            );
+
+
+            updatePowerActions();
+
+        }
+
+
+        /* =================================================
            ACHIEVEMENTS
         ================================================== */
 
@@ -4435,6 +5566,72 @@
 
                 description:
                     "Win 5 games",
+
+                reward: 150
+
+            },
+
+            oneShot: {
+
+                title: "One Shot",
+
+                description:
+                    "Win a game on your first guess",
+
+                reward: 75
+
+            },
+
+            protected: {
+
+                title: "Protected",
+
+                description:
+                    "Successfully use the Shield",
+
+                reward: 75
+
+            },
+
+            detective: {
+
+                title: "Detective",
+
+                description:
+                    "Use Number Scanner and win",
+
+                reward: 100
+
+            },
+
+            luckyBreak: {
+
+                title: "Lucky Break",
+
+                description:
+                    "Use Lucky Number and win",
+
+                reward: 100
+
+            },
+
+            againstOdds: {
+
+                title: "Against the Odds",
+
+                description:
+                    "Win after activating Second Chance",
+
+                reward: 150
+
+            },
+
+            precisionMaster: {
+
+                title: "Precision Master",
+
+                description:
+                    "Win a game while Precision Boost is active",
 
                 reward: 150
 
@@ -4526,6 +5723,71 @@
             }
 
 
+            if (
+                attempts === 1
+            ) {
+
+                unlockedNow =
+                    unlockAchievement(
+                        "oneShot"
+                    ) ||
+                    unlockedNow;
+
+            }
+
+
+            if (
+                scannerUsedThisGame
+            ) {
+
+                unlockedNow =
+                    unlockAchievement(
+                        "detective"
+                    ) ||
+                    unlockedNow;
+
+            }
+
+
+            if (
+                save.items.luckyNumber
+            ) {
+
+                unlockedNow =
+                    unlockAchievement(
+                        "luckyBreak"
+                    ) ||
+                    unlockedNow;
+
+            }
+
+
+            if (
+                secondChanceUsedThisGame
+            ) {
+
+                unlockedNow =
+                    unlockAchievement(
+                        "againstOdds"
+                    ) ||
+                    unlockedNow;
+
+            }
+
+
+            if (
+                save.items.precisionBoost
+            ) {
+
+                unlockedNow =
+                    unlockAchievement(
+                        "precisionMaster"
+                    ) ||
+                    unlockedNow;
+
+            }
+
+
             if (unlockedNow) {
 
                 updateUI();
@@ -4605,7 +5867,25 @@
                     "achievementLevelEight",
 
                 streak:
-                    "achievementStreak"
+                    "achievementStreak",
+
+                oneShot:
+                    "achievementOneShot",
+
+                protected:
+                    "achievementProtected",
+
+                detective:
+                    "achievementDetective",
+
+                luckyBreak:
+                    "achievementLuckyBreak",
+
+                againstOdds:
+                    "achievementAgainstOdds",
+
+                precisionMaster:
+                    "achievementPrecisionMaster"
 
             };
 
@@ -5465,6 +6745,1444 @@
 
 
         /* =================================================
+           DUELS — CONSTANTS & STATE
+        ================================================== */
+
+        const DUEL_ENTRY_FEE = 100;
+
+        const DUEL_POT = 200;
+
+        const DUEL_HEARTBEAT_MS = 15000;
+
+        const DUEL_TIMEOUT_MS = 60000;
+
+
+        let activeDuelId = null;
+
+        let activeDuelUnsub = null;
+
+        let duelIsHost = false;
+
+        let duelHeartbeatTimer = null;
+
+        let duelRewardGranted = false;
+
+        let activeDuelMaximum = 0;
+
+        let pendingDuelCode = null;
+
+
+        function randomDuelCode() {
+
+            const alphabet =
+                "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+            const bytes =
+                new Uint8Array(5);
+
+            crypto.getRandomValues(
+                bytes
+            );
+
+            let output = "";
+
+            for (const byte of bytes) {
+
+                output +=
+                    alphabet[
+                        byte %
+                        alphabet.length
+                    ];
+
+            }
+
+            return output;
+
+        }
+
+
+        /* =================================================
+           DUELS — LOBBY
+        ================================================== */
+
+        function showDuelLobby() {
+
+            stopDuelHeartbeat();
+
+
+            if (activeDuelUnsub) {
+
+                activeDuelUnsub();
+
+                activeDuelUnsub = null;
+
+            }
+
+
+            activeDuelId = null;
+
+            duelIsHost = false;
+
+            duelRewardGranted = false;
+
+            activeDuelMaximum = 0;
+
+
+            document
+                .getElementById("duelLobby")
+                .classList.remove("hidden-auth");
+
+            document
+                .getElementById("duelWaiting")
+                .classList.add("hidden-auth");
+
+            document
+                .getElementById("duelActive")
+                .classList.add("hidden-auth");
+
+            document
+                .getElementById("duelFinished")
+                .classList.add("hidden-auth");
+
+
+            const hint =
+                document.getElementById(
+                    "duelJoinHint"
+                );
+
+            if (hint)
+                hint.textContent = "";
+
+
+            const codeInput =
+                document.getElementById(
+                    "duelCodeInput"
+                );
+
+            if (codeInput)
+                codeInput.value = "";
+
+
+            const guessInputDuel =
+                document.getElementById(
+                    "duelGuess"
+                );
+
+            if (guessInputDuel)
+                guessInputDuel.value = "";
+
+
+            const resultBox =
+                document.getElementById(
+                    "duelResult"
+                );
+
+            if (resultBox)
+                resultBox.textContent = "";
+
+        }
+
+
+        function requireDuelEligibility() {
+
+            if (
+                !firebaseReady ||
+                !currentUser
+            ) {
+
+                showToast(
+                    "⚠️",
+                    "Sign in required for duels."
+                );
+
+                return false;
+
+            }
+
+
+            if (!save.username) {
+
+                showToast(
+                    "👤",
+                    "Set a username first (Leaderboard tab)."
+                );
+
+                return false;
+
+            }
+
+
+            return true;
+
+        }
+
+
+        /* =================================================
+           DUELS — CREATE
+        ================================================== */
+
+        async function createDuel(maximum) {
+
+            if (!requireDuelEligibility())
+                return;
+
+
+            if (
+                save.coins <
+                DUEL_ENTRY_FEE
+            ) {
+
+                showToast(
+                    "🪙",
+                    "Not enough coins for entry fee!"
+                );
+
+                playWrongSound();
+
+                return;
+
+            }
+
+
+            playClickSound();
+
+
+            save.coins -=
+                DUEL_ENTRY_FEE;
+
+            saveGame();
+
+            updateUI();
+
+
+            const code =
+                randomDuelCode();
+
+
+            try {
+
+                const docRef =
+                    await firestoreDB
+                        .collection("duels")
+                        .add({
+
+                            code,
+
+                            hostUid:
+                                currentUser.uid,
+
+                            hostUsername:
+                                save.username,
+
+                            guestUid: null,
+
+                            guestUsername: null,
+
+                            status: "waiting",
+
+                            maximum,
+
+                            entryFee:
+                                DUEL_ENTRY_FEE,
+
+                            pot: DUEL_POT,
+
+                            secretNumber: null,
+
+                            hostAttempts: 0,
+
+                            guestAttempts: 0,
+
+                            hostLastResult: "",
+
+                            guestLastResult: "",
+
+                            hostLastSeenAt:
+                                firebase.firestore
+                                    .FieldValue
+                                    .serverTimestamp(),
+
+                            guestLastSeenAt: null,
+
+                            winnerUid: null,
+
+                            winnerUsername: null,
+
+                            createdAt:
+                                firebase.firestore
+                                    .FieldValue
+                                    .serverTimestamp(),
+
+                            finishedAt: null
+
+                        });
+
+
+                activeDuelId =
+                    docRef.id;
+
+                duelIsHost = true;
+
+                activeDuelMaximum =
+                    maximum;
+
+
+                document
+                    .getElementById(
+                        "duelWaitingCode"
+                    )
+                    .textContent =
+                    code;
+
+
+                document
+                    .getElementById("duelLobby")
+                    .classList.add(
+                        "hidden-auth"
+                    );
+
+                document
+                    .getElementById("duelWaiting")
+                    .classList.remove(
+                        "hidden-auth"
+                    );
+
+
+                subscribeToDuel(
+                    docRef.id
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Create duel failed:",
+                    error
+                );
+
+
+                save.coins +=
+                    DUEL_ENTRY_FEE;
+
+                saveGame();
+
+                updateUI();
+
+
+                showToast(
+                    "⚠️",
+                    "Couldn't create duel. Try again."
+                );
+
+            }
+
+        }
+
+
+        function copyDuelCode() {
+
+            const code =
+                document.getElementById(
+                    "duelWaitingCode"
+                ).textContent;
+
+
+            if (
+                !navigator.clipboard
+            ) return;
+
+
+            navigator.clipboard
+                .writeText(code)
+                .then(
+                    () =>
+                        showToast(
+                            "📋",
+                            "Code copied!"
+                        )
+                )
+                .catch(
+                    () => {}
+                );
+
+        }
+
+
+        function copyDuelLink() {
+
+            const code =
+                document.getElementById(
+                    "duelWaitingCode"
+                ).textContent;
+
+
+            const link =
+                `${location.origin}${location.pathname}?duel=${code}`;
+
+
+            if (
+                !navigator.clipboard
+            ) return;
+
+
+            navigator.clipboard
+                .writeText(link)
+                .then(
+                    () =>
+                        showToast(
+                            "🔗",
+                            "Link copied!"
+                        )
+                )
+                .catch(
+                    () => {}
+                );
+
+        }
+
+
+        async function cancelDuel() {
+
+            if (!activeDuelId)
+                return;
+
+
+            playClickSound();
+
+
+            try {
+
+                const docRef =
+                    firestoreDB
+                        .collection("duels")
+                        .doc(activeDuelId);
+
+
+                const doc =
+                    await docRef.get();
+
+                const data =
+                    doc.data();
+
+
+                if (
+                    data &&
+                    data.status ===
+                    "waiting" &&
+                    data.hostUid ===
+                    currentUser.uid
+                ) {
+
+                    await docRef.update({
+                        status: "cancelled"
+                    });
+
+
+                    save.coins +=
+                        DUEL_ENTRY_FEE;
+
+                    saveGame();
+
+                    updateUI();
+
+
+                    showToast(
+                        "↩️",
+                        "Duel cancelled — entry refunded."
+                    );
+
+                }
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Cancel duel failed:",
+                    error
+                );
+
+            }
+
+
+            showDuelLobby();
+
+        }
+
+
+        /* =================================================
+           DUELS — JOIN
+        ================================================== */
+
+        async function joinDuelByCode() {
+
+            if (!requireDuelEligibility())
+                return;
+
+
+            const hint =
+                document.getElementById(
+                    "duelJoinHint"
+                );
+
+            const input =
+                document.getElementById(
+                    "duelCodeInput"
+                );
+
+            const code =
+                (input.value || "")
+                    .trim()
+                    .toUpperCase();
+
+
+            if (code.length < 4) {
+
+                hint.textContent =
+                    "Enter a valid duel code.";
+
+                return;
+
+            }
+
+
+            if (
+                save.coins <
+                DUEL_ENTRY_FEE
+            ) {
+
+                hint.textContent =
+                    "Not enough coins for entry fee!";
+
+                playWrongSound();
+
+                return;
+
+            }
+
+
+            playClickSound();
+
+            hint.textContent =
+                "Joining…";
+
+
+            try {
+
+                const snapshot =
+                    await firestoreDB
+                        .collection("duels")
+                        .where(
+                            "code",
+                            "==",
+                            code
+                        )
+                        .where(
+                            "status",
+                            "==",
+                            "waiting"
+                        )
+                        .limit(1)
+                        .get();
+
+
+                if (snapshot.empty) {
+
+                    hint.textContent =
+                        "No open duel found with that code.";
+
+                    return;
+
+                }
+
+
+                const docSnap =
+                    snapshot.docs[0];
+
+
+                if (
+                    docSnap.data().hostUid ===
+                    currentUser.uid
+                ) {
+
+                    hint.textContent =
+                        "You can't join your own duel.";
+
+                    return;
+
+                }
+
+
+                const maximum =
+                    docSnap.data().maximum;
+
+
+                const secretNumber =
+                    Math.floor(
+                        Math.random() *
+                        maximum
+                    ) + 1;
+
+
+                await firestoreDB.runTransaction(
+                    async tx => {
+
+                        const fresh =
+                            await tx.get(
+                                docSnap.ref
+                            );
+
+
+                        if (
+                            !fresh.exists ||
+                            fresh.data().status !==
+                            "waiting"
+                        ) {
+
+                            throw new Error(
+                                "Duel no longer available."
+                            );
+
+                        }
+
+
+                        tx.update(
+                            docSnap.ref,
+                            {
+
+                                guestUid:
+                                    currentUser.uid,
+
+                                guestUsername:
+                                    save.username,
+
+                                status: "active",
+
+                                secretNumber,
+
+                                guestLastSeenAt:
+                                    firebase.firestore
+                                        .FieldValue
+                                        .serverTimestamp(),
+
+                                hostLastSeenAt:
+                                    firebase.firestore
+                                        .FieldValue
+                                        .serverTimestamp()
+
+                            }
+                        );
+
+                    }
+                );
+
+
+                save.coins -=
+                    DUEL_ENTRY_FEE;
+
+                saveGame();
+
+                updateUI();
+
+
+                activeDuelId =
+                    docSnap.id;
+
+                duelIsHost = false;
+
+                activeDuelMaximum =
+                    maximum;
+
+
+                document
+                    .getElementById("duelLobby")
+                    .classList.add(
+                        "hidden-auth"
+                    );
+
+
+                subscribeToDuel(
+                    docSnap.id
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Join duel failed:",
+                    error
+                );
+
+
+                hint.textContent =
+                    "Couldn't join that duel. It may have just filled up.";
+
+            }
+
+        }
+
+
+        /* =================================================
+           DUELS — LIVE SYNC
+        ================================================== */
+
+        function subscribeToDuel(duelId) {
+
+            if (activeDuelUnsub) {
+
+                activeDuelUnsub();
+
+            }
+
+
+            activeDuelUnsub =
+                firestoreDB
+                    .collection("duels")
+                    .doc(duelId)
+                    .onSnapshot(
+
+                        snap => {
+
+                            if (!snap.exists)
+                                return;
+
+
+                            renderDuelState(
+                                snap.data()
+                            );
+
+                        },
+
+                        error => {
+
+                            console.error(
+                                "Duel listener error:",
+                                error
+                            );
+
+                        }
+
+                    );
+
+        }
+
+
+        function renderDuelState(data) {
+
+            if (
+                data.status ===
+                "waiting"
+            ) {
+
+                document
+                    .getElementById(
+                        "duelWaitingStatus"
+                    )
+                    .textContent =
+                    "Waiting for an opponent…";
+
+                return;
+
+            }
+
+
+            if (
+                data.status ===
+                "cancelled"
+            ) {
+
+                if (activeDuelId)
+                    showDuelLobby();
+
+                return;
+
+            }
+
+
+            if (
+                data.status ===
+                "active"
+            ) {
+
+                activeDuelMaximum =
+                    data.maximum;
+
+
+                document
+                    .getElementById("duelWaiting")
+                    .classList.add(
+                        "hidden-auth"
+                    );
+
+                document
+                    .getElementById("duelFinished")
+                    .classList.add(
+                        "hidden-auth"
+                    );
+
+                document
+                    .getElementById("duelActive")
+                    .classList.remove(
+                        "hidden-auth"
+                    );
+
+
+                renderDuelActive(
+                    data
+                );
+
+
+                startDuelHeartbeat();
+
+                return;
+
+            }
+
+
+            if (
+                data.status ===
+                "finished"
+            ) {
+
+                stopDuelHeartbeat();
+
+
+                document
+                    .getElementById("duelActive")
+                    .classList.add(
+                        "hidden-auth"
+                    );
+
+                document
+                    .getElementById("duelWaiting")
+                    .classList.add(
+                        "hidden-auth"
+                    );
+
+                document
+                    .getElementById("duelFinished")
+                    .classList.remove(
+                        "hidden-auth"
+                    );
+
+
+                renderDuelFinished(
+                    data
+                );
+
+            }
+
+        }
+
+
+        function formatDuelResult(label) {
+
+            if (label === "GOT IT!")
+                return "🎉 GOT IT!";
+
+            if (label === "Too low")
+                return "📉 Too low!";
+
+            if (label === "Too high")
+                return "📈 Too high!";
+
+            return "";
+
+        }
+
+
+        function renderDuelActive(data) {
+
+            const myAttempts =
+                duelIsHost
+                    ? data.hostAttempts
+                    : data.guestAttempts;
+
+
+            const opponentAttempts =
+                duelIsHost
+                    ? data.guestAttempts
+                    : data.hostAttempts;
+
+
+            const opponentName =
+                duelIsHost
+                    ? (
+                        data.guestUsername ||
+                        "Opponent"
+                    )
+                    : data.hostUsername;
+
+
+            const myLastResult =
+                duelIsHost
+                    ? data.hostLastResult
+                    : data.guestLastResult;
+
+
+            const opponentLastResult =
+                duelIsHost
+                    ? data.guestLastResult
+                    : data.hostLastResult;
+
+
+            animateNumber(
+                "duelMyAttempts",
+                myAttempts || 0
+            );
+
+            animateNumber(
+                "duelOpponentAttempts",
+                opponentAttempts || 0
+            );
+
+
+            document
+                .getElementById("duelPot")
+                .textContent =
+                data.pot;
+
+
+            document
+                .getElementById("duelMessage")
+                .textContent =
+                `Guessing 1 to ${data.maximum.toLocaleString()} against ${opponentName}`;
+
+
+            const opponentNote =
+                document.getElementById(
+                    "duelOpponentNote"
+                );
+
+            if (opponentNote) {
+
+                opponentNote.textContent =
+                    opponentLastResult
+                        ? `${opponentName}: ${formatDuelResult(opponentLastResult)}`
+                        : "";
+
+            }
+
+
+            const resultBox =
+                document.getElementById(
+                    "duelResult"
+                );
+
+            if (resultBox) {
+
+                resultBox.textContent =
+                    formatDuelResult(
+                        myLastResult
+                    );
+
+            }
+
+
+            checkDuelTimeout(
+                data
+            );
+
+        }
+
+
+        function renderDuelFinished(data) {
+
+            const iAmWinner =
+                data.winnerUid ===
+                currentUser.uid;
+
+
+            const icon =
+                document.getElementById(
+                    "duelFinishedIcon"
+                );
+
+            const title =
+                document.getElementById(
+                    "duelFinishedTitle"
+                );
+
+            const message =
+                document.getElementById(
+                    "duelFinishedMessage"
+                );
+
+
+            if (iAmWinner) {
+
+                icon.textContent =
+                    "🏆";
+
+                title.textContent =
+                    "YOU WON!";
+
+                message.textContent =
+                    `+${data.pot} coins`;
+
+
+                if (
+                    !duelRewardGranted
+                ) {
+
+                    duelRewardGranted =
+                        true;
+
+
+                    save.coins +=
+                        data.pot;
+
+                    saveGame();
+
+                    updateUI();
+
+
+                    playCorrectSound();
+
+
+                    setTimeout(
+                        playCoinSound,
+                        260
+                    );
+
+
+                    checkAchievements();
+
+                }
+
+            }
+
+            else {
+
+                icon.textContent =
+                    "💀";
+
+                title.textContent =
+                    "DEFEATED";
+
+
+                const opponentName =
+                    data.winnerUsername ||
+                    "Your opponent";
+
+
+                message.textContent =
+                    `${opponentName} guessed it first. The number was ${data.secretNumber.toLocaleString()}.`;
+
+
+                if (
+                    !duelRewardGranted
+                ) {
+
+                    duelRewardGranted =
+                        true;
+
+                    playWrongSound();
+
+                }
+
+            }
+
+        }
+
+
+        /* =================================================
+           DUELS — GUESSING
+        ================================================== */
+
+        async function submitDuelGuess() {
+
+            if (!activeDuelId)
+                return;
+
+
+            const input =
+                document.getElementById(
+                    "duelGuess"
+                );
+
+            const result =
+                document.getElementById(
+                    "duelResult"
+                );
+
+            const guess =
+                Number(
+                    input.value
+                );
+
+
+            if (
+                !Number.isInteger(guess) ||
+                guess < 1 ||
+                guess > activeDuelMaximum
+            ) {
+
+                result.textContent =
+                    `⚠️ Enter a whole number from 1 to ${activeDuelMaximum.toLocaleString()}!`;
+
+                return;
+
+            }
+
+
+            playClickSound();
+
+
+            try {
+
+                const docRef =
+                    firestoreDB
+                        .collection("duels")
+                        .doc(activeDuelId);
+
+
+                await firestoreDB.runTransaction(
+                    async tx => {
+
+                        const fresh =
+                            await tx.get(
+                                docRef
+                            );
+
+                        const data =
+                            fresh.data();
+
+
+                        if (
+                            !data ||
+                            data.status !==
+                            "active"
+                        ) return;
+
+
+                        const isCorrect =
+                            guess ===
+                            data.secretNumber;
+
+
+                        const updates = {};
+
+
+                        if (duelIsHost) {
+
+                            updates.hostAttempts =
+                                (data.hostAttempts || 0) + 1;
+
+                            updates.hostLastResult =
+                                isCorrect
+                                    ? "GOT IT!"
+                                    : (
+                                        guess < data.secretNumber
+                                            ? "Too low"
+                                            : "Too high"
+                                    );
+
+                            updates.hostLastSeenAt =
+                                firebase.firestore
+                                    .FieldValue
+                                    .serverTimestamp();
+
+                        }
+
+                        else {
+
+                            updates.guestAttempts =
+                                (data.guestAttempts || 0) + 1;
+
+                            updates.guestLastResult =
+                                isCorrect
+                                    ? "GOT IT!"
+                                    : (
+                                        guess < data.secretNumber
+                                            ? "Too low"
+                                            : "Too high"
+                                    );
+
+                            updates.guestLastSeenAt =
+                                firebase.firestore
+                                    .FieldValue
+                                    .serverTimestamp();
+
+                        }
+
+
+                        if (
+                            isCorrect &&
+                            !data.winnerUid
+                        ) {
+
+                            updates.winnerUid =
+                                currentUser.uid;
+
+                            updates.winnerUsername =
+                                save.username;
+
+                            updates.status =
+                                "finished";
+
+                            updates.finishedAt =
+                                firebase.firestore
+                                    .FieldValue
+                                    .serverTimestamp();
+
+                        }
+
+
+                        tx.update(
+                            docRef,
+                            updates
+                        );
+
+                    }
+                );
+
+
+                input.value = "";
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Duel guess failed:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        /* =================================================
+           DUELS — HEARTBEAT & TIMEOUT CLAIM
+        ================================================== */
+
+        function startDuelHeartbeat() {
+
+            if (duelHeartbeatTimer)
+                return;
+
+
+            duelHeartbeatTimer =
+                setInterval(
+                    sendDuelHeartbeat,
+                    DUEL_HEARTBEAT_MS
+                );
+
+
+            sendDuelHeartbeat();
+
+        }
+
+
+        function stopDuelHeartbeat() {
+
+            if (duelHeartbeatTimer) {
+
+                clearInterval(
+                    duelHeartbeatTimer
+                );
+
+                duelHeartbeatTimer =
+                    null;
+
+            }
+
+        }
+
+
+        function sendDuelHeartbeat() {
+
+            if (
+                !activeDuelId ||
+                !currentUser
+            ) return;
+
+
+            const field =
+                duelIsHost
+                    ? "hostLastSeenAt"
+                    : "guestLastSeenAt";
+
+
+            firestoreDB
+                .collection("duels")
+                .doc(activeDuelId)
+                .update({
+                    [field]:
+                        firebase.firestore
+                            .FieldValue
+                            .serverTimestamp()
+                })
+                .catch(
+                    () => {}
+                );
+
+        }
+
+
+        function checkDuelTimeout(data) {
+
+            const container =
+                document.getElementById(
+                    "duelTimeoutAction"
+                );
+
+
+            if (!container)
+                return;
+
+
+            container.innerHTML =
+                "";
+
+
+            const opponentLastSeen =
+                duelIsHost
+                    ? data.guestLastSeenAt
+                    : data.hostLastSeenAt;
+
+
+            if (!opponentLastSeen)
+                return;
+
+
+            const elapsed =
+                Date.now() -
+                opponentLastSeen.toMillis();
+
+
+            if (
+                elapsed >
+                DUEL_TIMEOUT_MS
+            ) {
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                button.className =
+                    "secondary-button power-button";
+
+
+                button.textContent =
+                    "⏱️ Claim Win — Opponent Inactive";
+
+
+                button.onclick =
+                    claimDuelTimeoutWin;
+
+
+                container.appendChild(
+                    button
+                );
+
+            }
+
+        }
+
+
+        async function claimDuelTimeoutWin() {
+
+            if (!activeDuelId)
+                return;
+
+
+            playClickSound();
+
+
+            try {
+
+                const docRef =
+                    firestoreDB
+                        .collection("duels")
+                        .doc(activeDuelId);
+
+
+                await firestoreDB.runTransaction(
+                    async tx => {
+
+                        const fresh =
+                            await tx.get(
+                                docRef
+                            );
+
+                        const data =
+                            fresh.data();
+
+
+                        if (
+                            !data ||
+                            data.status !==
+                            "active" ||
+                            data.winnerUid
+                        ) return;
+
+
+                        const opponentLastSeen =
+                            duelIsHost
+                                ? data.guestLastSeenAt
+                                : data.hostLastSeenAt;
+
+
+                        if (!opponentLastSeen)
+                            return;
+
+
+                        const elapsed =
+                            Date.now() -
+                            opponentLastSeen.toMillis();
+
+
+                        if (
+                            elapsed <
+                            DUEL_TIMEOUT_MS
+                        ) return;
+
+
+                        tx.update(
+                            docRef,
+                            {
+
+                                winnerUid:
+                                    currentUser.uid,
+
+                                winnerUsername:
+                                    save.username,
+
+                                status: "finished",
+
+                                finishedAt:
+                                    firebase.firestore
+                                        .FieldValue
+                                        .serverTimestamp()
+
+                            }
+                        );
+
+                    }
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Claim timeout win failed:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        /* =================================================
            ENTER KEY
         ================================================== */
 
@@ -5521,6 +8239,22 @@
         /* =================================================
            INITIALIZE
         ================================================== */
+
+        const duelCodeFromURL =
+            new URLSearchParams(
+                location.search
+            ).get("duel");
+
+
+        if (duelCodeFromURL) {
+
+            pendingDuelCode =
+                duelCodeFromURL
+                    .toUpperCase()
+                    .slice(0, 6);
+
+        }
+
 
         spawnParticles();
 
