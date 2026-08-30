@@ -7160,6 +7160,10 @@
 
                             guestLastResult: "",
 
+                            hostLastGuessValue: null,
+
+                            guestLastGuessValue: null,
+
                             hostLastSeenAt:
                                 firebase.firestore
                                     .FieldValue
@@ -8034,6 +8038,9 @@
                             updates.hostAttempts =
                                 (data.hostAttempts || 0) + 1;
 
+                            updates.hostLastGuessValue =
+                                guess;
+
                             updates.hostLastResult =
                                 isCorrect
                                     ? "GOT IT!"
@@ -8054,6 +8061,9 @@
 
                             updates.guestAttempts =
                                 (data.guestAttempts || 0) + 1;
+
+                            updates.guestLastGuessValue =
+                                guess;
 
                             updates.guestLastResult =
                                 isCorrect
