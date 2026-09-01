@@ -158,6 +158,12 @@
             margin: 18px 0;
         }
 
+        .duel-section-sub {
+            font-size: .82rem;
+            opacity: .7;
+            margin: 4px 0 12px;
+        }
+
         .duel-center {
             text-align: center;
         }
@@ -1221,8 +1227,60 @@
                         <div class="duel-create">
 
                             <span class="eyebrow">
-                                CREATE A DUEL
+                                ⚡ QUICK MATCH
                             </span>
+
+                            <p class="duel-section-sub">
+                                Auto-paired with a random opponent.
+                            </p>
+
+                            <div class="level-grid duel-range-grid">
+
+                                <button
+                                    class="level-button"
+                                    onclick="findQuickMatch(100)"
+                                >
+                                    <span class="level-icon">⚡</span>
+                                    <strong>Quick</strong>
+                                    <small>1 – 100</small>
+                                </button>
+
+                                <button
+                                    class="level-button"
+                                    onclick="findQuickMatch(1000)"
+                                >
+                                    <span class="level-icon">🔥</span>
+                                    <strong>Standard</strong>
+                                    <small>1 – 1,000</small>
+                                </button>
+
+                                <button
+                                    class="level-button"
+                                    onclick="findQuickMatch(10000)"
+                                >
+                                    <span class="level-icon">💀</span>
+                                    <strong>Extreme</strong>
+                                    <small>1 – 10,000</small>
+                                </button>
+
+                            </div>
+
+                            <div class="auth-note">
+                                Entry fee: 🪙 100 · Winner takes 🪙 200
+                            </div>
+
+                        </div>
+
+
+                        <div class="duel-create">
+
+                            <span class="eyebrow">
+                                🔒 PRIVATE DUEL
+                            </span>
+
+                            <p class="duel-section-sub">
+                                Generates a code to send a friend.
+                            </p>
 
                             <div class="level-grid duel-range-grid">
 
@@ -1265,7 +1323,7 @@
                         <div class="duel-join">
 
                             <span class="eyebrow">
-                                JOIN A DUEL
+                                JOIN A PRIVATE DUEL
                             </span>
 
                             <div class="username-row">
@@ -1294,6 +1352,32 @@
                             ></small>
 
                         </div>
+
+                    </div>
+
+
+                    <!-- SEARCHING (QUICK MATCH) -->
+
+                    <div
+                        id="duelSearching"
+                        class="hidden-auth"
+                    >
+
+                        <div class="spinner"></div>
+
+                        <p
+                            class="auth-note duel-center"
+                            id="duelSearchingStatus"
+                        >
+                            Searching for an opponent…
+                        </p>
+
+                        <button
+                            class="secondary-button"
+                            onclick="cancelDuel()"
+                        >
+                            ✕ Cancel Search
+                        </button>
 
                     </div>
 
@@ -6935,6 +7019,246 @@
         let pendingDuelCode = null;
 
 
+
+        /* =================================================
+           DUELS — 100 BOT OPPONENTS
+        ================================================== */
+        const BOT_BASE_NAMES = [
+            "Nova","Shadow","Pixel","Cipher","Blaze",
+            "Vortex","Echo","Orbit","Phantom","Volt",
+            "Raven","Titan","Glitch","Frost","Comet",
+            "Apex","Lunar","Neon","Drift","Zen"
+        ];
+
+        /*
+         * 100 BOTS
+         * 30 Rookie / 30 Normal / 20 Hard / 15 Expert / 5 Legend
+         *
+         * The lower tiers are intentionally easier:
+         * - slower reactions
+         * - higher mistake rates
+         * - less reliable guesses
+         */
+        const BOT_TIERS = [
+            ...Array(30).fill({
+                difficulty: "ROOKIE",
+                reactionMin: 2200,
+                reactionMax: 3600,
+                mistakeChance: 0.62,
+                strategyChance: 0.20
+            }),
+            ...Array(30).fill({
+                difficulty: "NORMAL",
+                reactionMin: 1700,
+                reactionMax: 2900,
+                mistakeChance: 0.40,
+                strategyChance: 0.50
+            }),
+            ...Array(20).fill({
+                difficulty: "HARD",
+                reactionMin: 1200,
+                reactionMax: 2100,
+                mistakeChance: 0.20,
+                strategyChance: 0.75
+            }),
+            ...Array(15).fill({
+                difficulty: "EXPERT",
+                reactionMin: 850,
+                reactionMax: 1500,
+                mistakeChance: 0.08,
+                strategyChance: 0.92
+            }),
+            ...Array(5).fill({
+                difficulty: "LEGEND",
+                reactionMin: 600,
+                reactionMax: 1100,
+                mistakeChance: 0.025,
+                strategyChance: 0.98
+            })
+        ];
+
+        const DUEL_BOTS = Array.from({ length: 100 }, (_, i) => {
+            const n = i + 1;
+            const tier = BOT_TIERS[i];
+
+            return {
+                id: `bot-${n}`,
+                username: `${BOT_BASE_NAMES[i % BOT_BASE_NAMES.length]}-${String(n).padStart(3, "0")}`,
+                difficulty: tier.difficulty,
+                reactionMin: tier.reactionMin,
+                reactionMax: tier.reactionMax,
+                mistakeChance: tier.mistakeChance,
+                strategyChance: tier.strategyChance
+            };
+        });
+
+        let activeBotDuel = null;
+        let botTurnTimer = null;
+
+        function clearBotTurn() {
+            if (botTurnTimer) {
+                clearTimeout(botTurnTimer);
+                botTurnTimer = null;
+            }
+        }
+
+        function pickBotForMatch() {
+            // Every bot has an equal chance of being selected.
+            return DUEL_BOTS[
+                Math.floor(Math.random() * DUEL_BOTS.length)
+            ];
+        }
+
+        function buildBotDuelData() {
+            if (!activeBotDuel) return null;
+            return {
+                status: activeBotDuel.status,
+                maximum: activeBotDuel.maximum,
+                pot: DUEL_POT,
+                secretNumber: activeBotDuel.secretNumber,
+                hostAttempts: activeBotDuel.playerAttempts,
+                guestAttempts: activeBotDuel.botAttempts,
+                hostLastResult: activeBotDuel.playerLastResult,
+                guestLastResult: activeBotDuel.botLastResult,
+                hostUsername: save.username,
+                guestUsername: `${activeBotDuel.bot.username} 🤖`,
+                winnerUid: activeBotDuel.winnerUid,
+                winnerUsername: activeBotDuel.winnerUsername
+            };
+        }
+
+        function renderBotDuel() {
+            const data = buildBotDuelData();
+            if (!data) return;
+
+            if (data.status === "active") {
+                document.getElementById("duelSearching").classList.add("hidden-auth");
+                document.getElementById("duelWaiting").classList.add("hidden-auth");
+                document.getElementById("duelFinished").classList.add("hidden-auth");
+                document.getElementById("duelActive").classList.remove("hidden-auth");
+                renderDuelActive(data);
+            } else {
+                clearBotTurn();
+                document.getElementById("duelActive").classList.add("hidden-auth");
+                document.getElementById("duelSearching").classList.add("hidden-auth");
+                document.getElementById("duelWaiting").classList.add("hidden-auth");
+                document.getElementById("duelFinished").classList.remove("hidden-auth");
+                renderDuelFinished(data);
+            }
+        }
+
+        function startBotDuel(maximum) {
+            const bot = pickBotForMatch();
+
+            save.coins -= DUEL_ENTRY_FEE;
+            saveGame();
+            updateUI();
+
+            activeDuelId = "BOT_LOCAL";
+            duelIsHost = true;
+            activeDuelMaximum = maximum;
+            duelRewardGranted = false;
+
+            activeBotDuel = {
+                bot,
+                maximum,
+                secretNumber: Math.floor(Math.random() * maximum) + 1,
+                low: 1,
+                high: maximum,
+                status: "active",
+                playerAttempts: 0,
+                botAttempts: 0,
+                playerLastResult: "",
+                botLastResult: "",
+                winnerUid: null,
+                winnerUsername: null
+            };
+
+            const status = document.getElementById("duelSearchingStatus");
+            if (status) status.textContent = `Opponent found: ${bot.username} 🤖 — ${bot.difficulty}`;
+
+            setTimeout(renderBotDuel, 450);
+            showToast("🤖", `Matched with ${bot.username} — ${bot.difficulty}`);
+            scheduleBotTurn();
+        }
+
+        function scheduleBotTurn() {
+            clearBotTurn();
+            if (!activeBotDuel || activeBotDuel.status !== "active") return;
+
+            const bot = activeBotDuel.bot;
+            const delay = bot.reactionMin + Math.random() * (bot.reactionMax - bot.reactionMin);
+            botTurnTimer = setTimeout(runBotTurn, delay);
+        }
+
+        function runBotTurn() {
+            botTurnTimer = null;
+            if (!activeBotDuel || activeBotDuel.status !== "active") return;
+
+            const duel = activeBotDuel;
+            const bot = duel.bot;
+
+            let guess;
+
+            // Easier bots make genuinely less efficient guesses.
+            // Stronger bots increasingly use binary-search logic.
+            if (Math.random() < bot.mistakeChance) {
+                guess =
+                    duel.low +
+                    Math.floor(
+                        Math.random() *
+                        (duel.high - duel.low + 1)
+                    );
+            } else if (Math.random() < bot.strategyChance) {
+                guess = Math.floor(
+                    (duel.low + duel.high) / 2
+                );
+            } else {
+                // Midpoint-biased but imperfect guess.
+                const midpoint =
+                    (duel.low + duel.high) / 2;
+                const range =
+                    Math.max(
+                        1,
+                        Math.floor(
+                            (duel.high - duel.low) * 0.35
+                        )
+                    );
+
+                guess = Math.round(
+                    midpoint +
+                    (Math.random() * 2 - 1) * range
+                );
+
+                guess = Math.max(
+                    duel.low,
+                    Math.min(duel.high, guess)
+                );
+            }
+
+            duel.botAttempts += 1;
+
+            if (guess === duel.secretNumber) {
+                duel.botLastResult = "GOT IT!";
+                duel.status = "finished";
+                duel.winnerUid = bot.id;
+                duel.winnerUsername = `${bot.username} 🤖`;
+                renderBotDuel();
+                return;
+            }
+
+            if (guess < duel.secretNumber) {
+                duel.botLastResult = "Too low";
+                duel.low = Math.max(duel.low, guess + 1);
+            } else {
+                duel.botLastResult = "Too high";
+                duel.high = Math.min(duel.high, guess - 1);
+            }
+
+            renderBotDuel();
+            scheduleBotTurn();
+        }
+
         function randomDuelCode() {
 
             const alphabet =
@@ -6994,6 +7318,10 @@
             document
                 .getElementById("duelLobby")
                 .classList.remove("hidden-auth");
+
+            document
+                .getElementById("duelSearching")
+                .classList.add("hidden-auth");
 
             document
                 .getElementById("duelWaiting")
@@ -7143,6 +7471,8 @@
 
                             status: "waiting",
 
+                            matchmaking: false,
+
                             maximum,
 
                             entryFee:
@@ -7241,6 +7571,327 @@
                     "⚠️",
                     "Couldn't create duel. Try again."
                 );
+
+            }
+
+        }
+
+
+        /* =================================================
+           DUELS — QUICK MATCH
+        ================================================== */
+
+        async function findQuickMatch(maximum) {
+            if (!requireDuelEligibility()) return;
+
+            if (save.coins < DUEL_ENTRY_FEE) {
+                showToast("🪙", "Not enough coins for entry fee!");
+                playWrongSound();
+                return;
+            }
+
+            playClickSound();
+            document.getElementById("duelLobby").classList.add("hidden-auth");
+            document.getElementById("duelSearching").classList.remove("hidden-auth");
+            document.getElementById("duelSearchingStatus").textContent =
+                "Searching for a real opponent…";
+
+            try {
+                const snapshot = await firestoreDB
+                    .collection("duels")
+                    .where("status", "==", "waiting")
+                    .where("matchmaking", "==", true)
+                    .where("maximum", "==", maximum)
+                    .orderBy("createdAt", "asc")
+                    .limit(5)
+                    .get();
+
+                const candidates = snapshot.docs.filter(
+                    doc => doc.data().hostUid !== currentUser.uid
+                );
+
+                for (const candidate of candidates) {
+                    const joined = await attemptJoinDuel(candidate.ref);
+                    if (joined) return;
+                }
+
+                document.getElementById("duelSearchingStatus").textContent =
+                    "No player found — deploying a bot…";
+                setTimeout(() => startBotDuel(maximum), 900);
+            } catch (error) {
+                console.error("Quick match search failed:", error);
+                document.getElementById("duelSearchingStatus").textContent =
+                    "Matchmaking unavailable — deploying a bot…";
+                setTimeout(() => startBotDuel(maximum), 500);
+            }
+        }
+
+
+        async function createQuickMatchQueueEntry(maximum) {
+
+            save.coins -=
+                DUEL_ENTRY_FEE;
+
+            saveGame();
+
+            updateUI();
+
+
+            const code =
+                randomDuelCode();
+
+
+            try {
+
+                const docRef =
+                    await firestoreDB
+                        .collection("duels")
+                        .add({
+
+                            code,
+
+                            hostUid:
+                                currentUser.uid,
+
+                            hostUsername:
+                                save.username,
+
+                            guestUid: null,
+
+                            guestUsername: null,
+
+                            status: "waiting",
+
+                            matchmaking: true,
+
+                            maximum,
+
+                            entryFee:
+                                DUEL_ENTRY_FEE,
+
+                            pot: DUEL_POT,
+
+                            secretNumber: null,
+
+                            hostAttempts: 0,
+
+                            guestAttempts: 0,
+
+                            hostLastResult: "",
+
+                            guestLastResult: "",
+
+                            hostLastGuessValue: null,
+
+                            guestLastGuessValue: null,
+
+                            hostLastSeenAt:
+                                firebase.firestore
+                                    .FieldValue
+                                    .serverTimestamp(),
+
+                            guestLastSeenAt: null,
+
+                            winnerUid: null,
+
+                            winnerUsername: null,
+
+                            createdAt:
+                                firebase.firestore
+                                    .FieldValue
+                                    .serverTimestamp(),
+
+                            finishedAt: null
+
+                        });
+
+
+                activeDuelId =
+                    docRef.id;
+
+                duelIsHost = true;
+
+                activeDuelMaximum =
+                    maximum;
+
+
+                subscribeToDuel(
+                    docRef.id
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Create quick match failed:",
+                    error
+                );
+
+
+                save.coins +=
+                    DUEL_ENTRY_FEE;
+
+                saveGame();
+
+                updateUI();
+
+
+                document
+                    .getElementById("duelSearching")
+                    .classList.add(
+                        "hidden-auth"
+                    );
+
+                document
+                    .getElementById("duelLobby")
+                    .classList.remove(
+                        "hidden-auth"
+                    );
+
+
+                showToast(
+                    "⚠️",
+                    "Couldn't create a match. Try again."
+                );
+
+            }
+
+        }
+
+
+        async function attemptJoinDuel(docRef) {
+
+            try {
+
+                const snap =
+                    await docRef.get();
+
+
+                if (
+                    !snap.exists ||
+                    snap.data().status !==
+                    "waiting"
+                ) return false;
+
+
+                if (
+                    snap.data().hostUid ===
+                    currentUser.uid
+                ) return false;
+
+
+                const maximum =
+                    snap.data().maximum;
+
+
+                const secretNumber =
+                    Math.floor(
+                        Math.random() *
+                        maximum
+                    ) + 1;
+
+
+                await firestoreDB.runTransaction(
+                    async tx => {
+
+                        const fresh =
+                            await tx.get(
+                                docRef
+                            );
+
+
+                        if (
+                            !fresh.exists ||
+                            fresh.data().status !==
+                            "waiting"
+                        ) {
+
+                            throw new Error(
+                                "Duel no longer available."
+                            );
+
+                        }
+
+
+                        tx.update(
+                            docRef,
+                            {
+
+                                guestUid:
+                                    currentUser.uid,
+
+                                guestUsername:
+                                    save.username,
+
+                                status: "active",
+
+                                secretNumber,
+
+                                guestLastSeenAt:
+                                    firebase.firestore
+                                        .FieldValue
+                                        .serverTimestamp(),
+
+                                hostLastSeenAt:
+                                    firebase.firestore
+                                        .FieldValue
+                                        .serverTimestamp()
+
+                            }
+                        );
+
+                    }
+                );
+
+
+                save.coins -=
+                    DUEL_ENTRY_FEE;
+
+                saveGame();
+
+                updateUI();
+
+
+                activeDuelId =
+                    docRef.id;
+
+                duelIsHost = false;
+
+                activeDuelMaximum =
+                    maximum;
+
+
+                document
+                    .getElementById("duelLobby")
+                    .classList.add(
+                        "hidden-auth"
+                    );
+
+                document
+                    .getElementById("duelSearching")
+                    .classList.add(
+                        "hidden-auth"
+                    );
+
+
+                subscribeToDuel(
+                    docRef.id
+                );
+
+
+                return true;
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Join attempt failed:",
+                    error
+                );
+
+                return false;
 
             }
 
@@ -7481,97 +8132,18 @@
                 }
 
 
-                const maximum =
-                    docSnap.data().maximum;
-
-
-                const secretNumber =
-                    Math.floor(
-                        Math.random() *
-                        maximum
-                    ) + 1;
-
-
-                await firestoreDB.runTransaction(
-                    async tx => {
-
-                        const fresh =
-                            await tx.get(
-                                docSnap.ref
-                            );
-
-
-                        if (
-                            !fresh.exists ||
-                            fresh.data().status !==
-                            "waiting"
-                        ) {
-
-                            throw new Error(
-                                "Duel no longer available."
-                            );
-
-                        }
-
-
-                        tx.update(
-                            docSnap.ref,
-                            {
-
-                                guestUid:
-                                    currentUser.uid,
-
-                                guestUsername:
-                                    save.username,
-
-                                status: "active",
-
-                                secretNumber,
-
-                                guestLastSeenAt:
-                                    firebase.firestore
-                                        .FieldValue
-                                        .serverTimestamp(),
-
-                                hostLastSeenAt:
-                                    firebase.firestore
-                                        .FieldValue
-                                        .serverTimestamp()
-
-                            }
-                        );
-
-                    }
-                );
-
-
-                save.coins -=
-                    DUEL_ENTRY_FEE;
-
-                saveGame();
-
-                updateUI();
-
-
-                activeDuelId =
-                    docSnap.id;
-
-                duelIsHost = false;
-
-                activeDuelMaximum =
-                    maximum;
-
-
-                document
-                    .getElementById("duelLobby")
-                    .classList.add(
-                        "hidden-auth"
+                const joined =
+                    await attemptJoinDuel(
+                        docSnap.ref
                     );
 
 
-                subscribeToDuel(
-                    docSnap.id
-                );
+                if (!joined) {
+
+                    hint.textContent =
+                        "Couldn't join that duel. It may have just filled up.";
+
+                }
 
             }
 
@@ -7643,12 +8215,32 @@
                 "waiting"
             ) {
 
-                document
-                    .getElementById(
-                        "duelWaitingStatus"
-                    )
-                    .textContent =
-                    "Waiting for an opponent…";
+                if (data.matchmaking) {
+
+                    const searchingStatus =
+                        document.getElementById(
+                            "duelSearchingStatus"
+                        );
+
+                    if (searchingStatus) {
+
+                        searchingStatus.textContent =
+                            "Searching for an opponent…";
+
+                    }
+
+                }
+
+                else {
+
+                    document
+                        .getElementById(
+                            "duelWaitingStatus"
+                        )
+                        .textContent =
+                        "Waiting for an opponent…";
+
+                }
 
                 return;
 
@@ -7676,6 +8268,12 @@
                 activeDuelMaximum =
                     data.maximum;
 
+
+                document
+                    .getElementById("duelSearching")
+                    .classList.add(
+                        "hidden-auth"
+                    );
 
                 document
                     .getElementById("duelWaiting")
@@ -7718,6 +8316,12 @@
 
                 document
                     .getElementById("duelActive")
+                    .classList.add(
+                        "hidden-auth"
+                    );
+
+                document
+                    .getElementById("duelSearching")
                     .classList.add(
                         "hidden-auth"
                     );
@@ -7960,172 +8564,93 @@
         ================================================== */
 
         async function submitDuelGuess() {
-
-            if (!activeDuelId)
+            if (activeDuelId === "BOT_LOCAL") {
+                submitBotDuelGuess();
                 return;
-
-
-            const input =
-                document.getElementById(
-                    "duelGuess"
-                );
-
-            const result =
-                document.getElementById(
-                    "duelResult"
-                );
-
-            const guess =
-                Number(
-                    input.value
-                );
-
-
-            if (
-                !Number.isInteger(guess) ||
-                guess < 1 ||
-                guess > activeDuelMaximum
-            ) {
-
-                result.textContent =
-                    `⚠️ Enter a whole number from 1 to ${activeDuelMaximum.toLocaleString()}!`;
-
-                return;
-
             }
 
+            if (!activeDuelId) return;
+
+            const input = document.getElementById("duelGuess");
+            const result = document.getElementById("duelResult");
+            const guess = Number(input.value);
+
+            if (!Number.isInteger(guess) || guess < 1 || guess > activeDuelMaximum) {
+                result.textContent = `⚠️ Enter a whole number from 1 to ${activeDuelMaximum.toLocaleString()}!`;
+                return;
+            }
 
             playClickSound();
 
-
             try {
+                const docRef = firestoreDB.collection("duels").doc(activeDuelId);
 
-                const docRef =
-                    firestoreDB
-                        .collection("duels")
-                        .doc(activeDuelId);
+                await firestoreDB.runTransaction(async tx => {
+                    const fresh = await tx.get(docRef);
+                    const data = fresh.data();
+                    if (!data || data.status !== "active") return;
 
+                    const isCorrect = guess === data.secretNumber;
+                    const updates = {};
 
-                await firestoreDB.runTransaction(
-                    async tx => {
-
-                        const fresh =
-                            await tx.get(
-                                docRef
-                            );
-
-                        const data =
-                            fresh.data();
-
-
-                        if (
-                            !data ||
-                            data.status !==
-                            "active"
-                        ) return;
-
-
-                        const isCorrect =
-                            guess ===
-                            data.secretNumber;
-
-
-                        const updates = {};
-
-
-                        if (duelIsHost) {
-
-                            updates.hostAttempts =
-                                (data.hostAttempts || 0) + 1;
-
-                            updates.hostLastGuessValue =
-                                guess;
-
-                            updates.hostLastResult =
-                                isCorrect
-                                    ? "GOT IT!"
-                                    : (
-                                        guess < data.secretNumber
-                                            ? "Too low"
-                                            : "Too high"
-                                    );
-
-                            updates.hostLastSeenAt =
-                                firebase.firestore
-                                    .FieldValue
-                                    .serverTimestamp();
-
-                        }
-
-                        else {
-
-                            updates.guestAttempts =
-                                (data.guestAttempts || 0) + 1;
-
-                            updates.guestLastGuessValue =
-                                guess;
-
-                            updates.guestLastResult =
-                                isCorrect
-                                    ? "GOT IT!"
-                                    : (
-                                        guess < data.secretNumber
-                                            ? "Too low"
-                                            : "Too high"
-                                    );
-
-                            updates.guestLastSeenAt =
-                                firebase.firestore
-                                    .FieldValue
-                                    .serverTimestamp();
-
-                        }
-
-
-                        if (
-                            isCorrect &&
-                            !data.winnerUid
-                        ) {
-
-                            updates.winnerUid =
-                                currentUser.uid;
-
-                            updates.winnerUsername =
-                                save.username;
-
-                            updates.status =
-                                "finished";
-
-                            updates.finishedAt =
-                                firebase.firestore
-                                    .FieldValue
-                                    .serverTimestamp();
-
-                        }
-
-
-                        tx.update(
-                            docRef,
-                            updates
-                        );
-
+                    if (duelIsHost) {
+                        updates.hostAttempts = (data.hostAttempts || 0) + 1;
+                        updates.hostLastGuessValue = guess;
+                        updates.hostLastResult = isCorrect ? "GOT IT!" : (guess < data.secretNumber ? "Too low" : "Too high");
+                        updates.hostLastSeenAt = firebase.firestore.FieldValue.serverTimestamp();
+                    } else {
+                        updates.guestAttempts = (data.guestAttempts || 0) + 1;
+                        updates.guestLastGuessValue = guess;
+                        updates.guestLastResult = isCorrect ? "GOT IT!" : (guess < data.secretNumber ? "Too low" : "Too high");
+                        updates.guestLastSeenAt = firebase.firestore.FieldValue.serverTimestamp();
                     }
-                );
 
+                    if (isCorrect && !data.winnerUid) {
+                        updates.winnerUid = currentUser.uid;
+                        updates.winnerUsername = save.username;
+                        updates.status = "finished";
+                        updates.finishedAt = firebase.firestore.FieldValue.serverTimestamp();
+                    }
+
+                    tx.update(docRef, updates);
+                });
 
                 input.value = "";
+            } catch (error) {
+                console.error("Duel guess failed:", error);
+            }
+        }
 
+        function submitBotDuelGuess() {
+            if (!activeBotDuel || activeBotDuel.status !== "active") return;
+
+            const input = document.getElementById("duelGuess");
+            const result = document.getElementById("duelResult");
+            const guess = Number(input.value);
+
+            if (!Number.isInteger(guess) || guess < 1 || guess > activeDuelMaximum) {
+                result.textContent = `⚠️ Enter a whole number from 1 to ${activeDuelMaximum.toLocaleString()}!`;
+                return;
             }
 
-            catch (error) {
+            playClickSound();
+            activeBotDuel.playerAttempts += 1;
 
-                console.error(
-                    "Duel guess failed:",
-                    error
-                );
-
+            if (guess === activeBotDuel.secretNumber) {
+                activeBotDuel.playerLastResult = "GOT IT!";
+                activeBotDuel.status = "finished";
+                activeBotDuel.winnerUid = currentUser.uid;
+                activeBotDuel.winnerUsername = save.username;
+                input.value = "";
+                renderBotDuel();
+                return;
             }
 
+            activeBotDuel.playerLastResult =
+                guess < activeBotDuel.secretNumber ? "Too low" : "Too high";
+
+            input.value = "";
+            renderBotDuel();
         }
 
 
