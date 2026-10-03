@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -247,11 +248,195 @@
             font-weight: 700;
             opacity: .85;
         }
+
+        /* =====================================================
+           MOBILE / LOW-POWER PERFORMANCE
+           Applied when body has class "perf-mobile"
+        ====================================================== */
+        body.perf-mobile .orb,
+        body.perf-mobile .grid,
+        body.perf-mobile .perspective-grid {
+            animation: none !important;
+            opacity: 0.35;
+            filter: none !important;
+            transform: none !important;
+        }
+
+        body.perf-mobile .particles {
+            opacity: 0.6;
+        }
+
+        body.perf-mobile .particle {
+            box-shadow: none !important;
+            text-shadow: none !important;
+            will-change: transform, opacity;
+        }
+
+        body.perf-mobile .flying-coin,
+        body.perf-mobile .sparkle-burst {
+            display: none !important;
+        }
+
+        body.perf-mobile .hud-item,
+        body.perf-mobile .home-tile,
+        body.perf-mobile .level-button,
+        body.perf-mobile .shop-item {
+            transition: none !important;
+        }
+
+        body.perf-reduced-motion *,
+        body.perf-reduced-motion *::before,
+        body.perf-reduced-motion *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+
+        /* =====================================================
+           PRIVATE DEVELOPER RATING
+        ====================================================== */
+        .rating-card {
+            margin-top: 18px;
+            padding: 22px;
+            border-radius: 20px;
+            border: 1px solid rgba(120, 170, 255, .2);
+            background: rgba(10, 16, 35, .72);
+            text-align: center;
+        }
+
+        .rating-stars {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 14px 0 10px;
+        }
+
+        .rating-star {
+            width: 48px;
+            height: 48px;
+            padding: 0;
+            border-radius: 14px;
+            border: 1px solid rgba(120, 170, 255, .2);
+            background: rgba(255, 255, 255, .05);
+            color: inherit;
+            font-size: 1.45rem;
+            cursor: pointer;
+            transition: transform .15s ease, border-color .15s ease, background .15s ease;
+        }
+
+        .rating-star:hover,
+        .rating-star:focus-visible {
+            transform: translateY(-2px);
+            border-color: rgba(100, 170, 255, .8);
+            background: rgba(120, 170, 255, .12);
+            outline: none;
+        }
+
+        .rating-status {
+            min-height: 1.3em;
+            margin-top: 8px;
+            font-size: .85rem;
+            opacity: .75;
+        }
+
+        body.perf-mobile .rating-star {
+            transition: none;
+        }
+
+        /* =====================================================
+           LOADING SCREEN
+        ====================================================== */
+        #loadingScreen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            background: radial-gradient(ellipse at 50% 30%, #0f1a35 0%, #070b16 70%);
+            color: #e8eefc;
+            transition: opacity 0.45s ease, visibility 0.45s ease;
+        }
+
+        #loadingScreen.loading-done {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loading-icon {
+            font-size: 3.2rem;
+            line-height: 1;
+            animation: loading-pulse 1.4s ease-in-out infinite;
+        }
+
+        .loading-title {
+            font-size: 1.55rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            margin: 0;
+        }
+
+        .loading-sub {
+            margin: 0;
+            opacity: 0.7;
+            font-size: 0.95rem;
+        }
+
+        .loading-bar-track {
+            width: min(220px, 70vw);
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(120, 170, 255, 0.15);
+            overflow: hidden;
+            border: 1px solid rgba(120, 170, 255, 0.25);
+        }
+
+        .loading-bar-fill {
+            height: 100%;
+            width: 8%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            transition: width 0.35s ease;
+        }
+
+        .loading-pct {
+            font-size: 0.85rem;
+            opacity: 0.65;
+            font-variant-numeric: tabular-nums;
+            min-height: 1.2em;
+        }
+
+        @keyframes loading-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.08); opacity: 0.85; }
+        }
+
+        body.perf-mobile .loading-icon {
+            animation: none;
+        }
     </style>
 
 </head>
 
 <body>
+
+    <!-- =====================================================
+         LOADING SCREEN (waits for Firebase)
+    ====================================================== -->
+
+    <div id="loadingScreen" aria-live="polite" aria-busy="true">
+        <div class="loading-icon">🎮</div>
+        <h1 class="loading-title">Guess the Number</h1>
+        <p class="loading-sub" id="loadingStatus">Starting up…</p>
+        <div class="loading-bar-track">
+            <div class="loading-bar-fill" id="loadingBarFill"></div>
+        </div>
+        <div class="loading-pct" id="loadingPct">0%</div>
+    </div>
+
 
     <!-- =====================================================
          BACKGROUND ATMOSPHERE
@@ -270,7 +455,7 @@
          ACCOUNT / CROSS-DEVICE LOGIN
     ====================================================== -->
 
-    <section id="authScreen" class="auth-screen">
+    <section id="authScreen" class="auth-screen" style="visibility:hidden">
 
         <div class="auth-card">
 
@@ -487,16 +672,28 @@
                 </div>
 
 
-                <div class="hud-item level">
+               <div class="hud-item level">
 
-                    <span>⚡</span>
+    <span>⚡</span>
 
-                    <div>
-                        <small>Level</small>
-                        <strong id="playerLevel">1</strong>
-                    </div>
+    <div>
+        <small>Level</small>
+        <strong id="playerLevel">1</strong>
+    </div>
 
-                </div>
+</div>
+
+<div class="hud-item rating-hud">
+    <small>Rate the game 😊</small>
+    <div class="rating-stars-hud" role="group" aria-label="Rate the game">
+        <button class="rating-star" type="button" onclick="submitRating(1)" aria-label="1 star">⭐</button>
+        <button class="rating-star" type="button" onclick="submitRating(2)" aria-label="2 stars">⭐</button>
+        <button class="rating-star" type="button" onclick="submitRating(3)" aria-label="3 stars">⭐</button>
+        <button class="rating-star" type="button" onclick="submitRating(4)" aria-label="4 stars">⭐</button>
+        <button class="rating-star" type="button" onclick="submitRating(5)" aria-label="5 stars">⭐</button>
+    </div>
+    <div id="ratingStatus" class="rating-status" aria-live="polite"></div>
+</div>
 
 
                 <button
@@ -1655,6 +1852,31 @@
 
                     </div>
 
+
+                    <div class="rating-card">
+
+                        <span class="eyebrow">DEVELOPER FEEDBACK</span>
+
+                        <h3>⭐ Rate Guess the Number</h3>
+
+                        <p>
+                            Your rating is private. Only the developer can view the ratings.
+                        </p>
+
+                        <div class="rating-stars" role="group" aria-label="Rate the game from 1 to 5 stars">
+
+                            <button class="rating-star" type="button" onclick="submitRating(1)" aria-label="1 star">⭐</button>
+                            <button class="rating-star" type="button" onclick="submitRating(2)" aria-label="2 stars">⭐</button>
+                            <button class="rating-star" type="button" onclick="submitRating(3)" aria-label="3 stars">⭐</button>
+                            <button class="rating-star" type="button" onclick="submitRating(4)" aria-label="4 stars">⭐</button>
+                            <button class="rating-star" type="button" onclick="submitRating(5)" aria-label="5 stars">⭐</button>
+
+                        </div>
+
+                        <div id="ratingStatus" class="rating-status" aria-live="polite"></div>
+
+                    </div>
+
                 </div>
 
             </section>
@@ -2100,9 +2322,83 @@
         let cloudSaveTimer = null;
         let accountCreatedPending = false;
         let suppressAuthListener = false;
+        let loadingFinished = false;
+        let loadingStartTime = Date.now();
+        const LOADING_MIN_MS = 900;
+
+
+        function setLoadingProgress(pct, message) {
+            const fill = document.getElementById("loadingBarFill");
+            const pctEl = document.getElementById("loadingPct");
+            const status = document.getElementById("loadingStatus");
+            const clamped = Math.max(0, Math.min(100, pct));
+            if (fill) fill.style.width = clamped + "%";
+            if (pctEl) pctEl.textContent = Math.round(clamped) + "%";
+            if (status && message) status.textContent = message;
+        }
+
+
+        function finishLoadingScreen() {
+            if (loadingFinished) return;
+            loadingFinished = true;
+
+            setLoadingProgress(100, "READY. 🎮");
+
+            const remaining = Math.max(
+                0,
+                LOADING_MIN_MS - (Date.now() - loadingStartTime)
+            );
+
+            setTimeout(() => {
+                const screen = document.getElementById("loadingScreen");
+                if (screen) {
+                    screen.classList.add("loading-done");
+                    screen.setAttribute("aria-busy", "false");
+                    // Fully remove from interaction after fade
+                    setTimeout(() => {
+                        if (screen) screen.style.display = "none";
+                    }, 500);
+                }
+
+                const auth = document.getElementById("authScreen");
+                const app = document.getElementById("gameApp");
+
+                // Already logged in → straight into the game (no login screen)
+                if (currentUser && !accountCreatedPending) {
+                    if (auth) {
+                        auth.style.visibility = "hidden";
+                        auth.classList.add("hidden-auth");
+                    }
+                    if (app) {
+                        app.classList.remove("auth-locked");
+                    }
+                }
+                // First time / not logged in → show login or create account
+                else {
+                    if (auth) {
+                        auth.style.visibility = "visible";
+                        auth.classList.remove("hidden-auth");
+                    }
+                    if (app) {
+                        app.classList.add("auth-locked");
+                    }
+                }
+            }, remaining + 280);
+        }
 
 
         function initFirebase() {
+
+            setLoadingProgress(15, "Connecting…");
+
+            // Safety: never leave the user stuck on loading
+            setTimeout(() => {
+                if (!loadingFinished) {
+                    console.warn("Loading timeout — showing login");
+                    lockGame();
+                    finishLoadingScreen();
+                }
+            }, 8000);
 
             try {
 
@@ -2113,6 +2409,8 @@
 
                 firebaseReady = true;
 
+                setLoadingProgress(40, "Checking account…");
+
 
                 firebaseAuth.onAuthStateChanged(
                     async user => {
@@ -2122,8 +2420,9 @@
 
                         if (!user) {
 
+                            setLoadingProgress(90, "Almost ready…");
                             lockGame();
-
+                            finishLoadingScreen();
                             return;
 
                         }
@@ -2136,7 +2435,11 @@
 
                         try {
 
+                            setLoadingProgress(65, "Loading your progress…");
+
                             await loadCloudAccount(user);
+
+                            setLoadingProgress(95, "Almost ready…");
 
 
                             if (accountCreatedPending) {
@@ -2155,6 +2458,9 @@
                                     .getElementById("createdPanel")
                                     .classList.remove("hidden-auth");
 
+                                // Still on auth flow — show created credentials
+                                lockGame();
+
                             }
 
                             else {
@@ -2162,6 +2468,8 @@
                                 unlockGame();
 
                             }
+
+                            finishLoadingScreen();
 
                         }
 
@@ -2177,6 +2485,9 @@
                             );
 
                             await firebaseAuth.signOut();
+
+                            lockGame();
+                            finishLoadingScreen();
 
                         }
 
@@ -2194,9 +2505,14 @@
 
                 firebaseReady = false;
 
+                setLoadingProgress(100, "Connection issue");
+
                 showAuthError(
                     "Firebase could not start. Check your Firebase configuration."
                 );
+
+                lockGame();
+                finishLoadingScreen();
 
             }
 
@@ -3036,6 +3352,7 @@
 
         /* =================================================
            PERFORMANCE SETTINGS
+           Strong mobile / low-power mode to stop phone lag
         ================================================== */
 
         const performanceMode = {
@@ -3043,18 +3360,100 @@
             mobile:
                 window.matchMedia(
                     "(max-width: 700px)"
-                ).matches,
+                ).matches ||
+                /Android|iPhone|iPad|iPod|Mobile/i.test(
+                    navigator.userAgent
+                ),
 
             reducedMotion:
                 window.matchMedia(
                     "(prefers-reduced-motion: reduce)"
-                ).matches
+                ).matches,
+
+            // True when the tab is in the background
+            pageHidden: false
 
         };
 
 
+        // Pause heavy work when the user leaves the tab
+        document.addEventListener(
+            "visibilitychange",
+            () => {
+
+                performanceMode.pageHidden =
+                    document.hidden;
+
+                if (document.hidden) {
+
+                    // Stop music so the phone doesn't keep
+                    // running audio work in the background
+                    if (musicPlaying) {
+                        stopBackgroundMusic();
+                        const icon =
+                            document.getElementById(
+                                "musicIcon"
+                            );
+                        const label =
+                            document.getElementById(
+                                "musicLabel"
+                            );
+                        if (icon)
+                            icon.textContent = "🔇";
+                        if (label)
+                            label.textContent = "Off";
+                    }
+
+                    // Freeze particle CSS animations
+                    const particles =
+                        document.getElementById(
+                            "particles"
+                        );
+                    if (particles) {
+                        particles.style
+                            .animationPlayState =
+                            "paused";
+                        particles
+                            .querySelectorAll(
+                                ".particle"
+                            )
+                            .forEach(p => {
+                                p.style
+                                    .animationPlayState =
+                                    "paused";
+                            });
+                    }
+
+                } else {
+
+                    const particles =
+                        document.getElementById(
+                            "particles"
+                        );
+                    if (particles) {
+                        particles.style
+                            .animationPlayState =
+                            "running";
+                        particles
+                            .querySelectorAll(
+                                ".particle"
+                            )
+                            .forEach(p => {
+                                p.style
+                                    .animationPlayState =
+                                    "running";
+                            });
+                    }
+
+                }
+
+            }
+        );
+
+
         /* =================================================
            PARTICLES
+           Mobile: 0–4 particles max, no shadows, no stars
         ================================================== */
 
         function spawnParticles(count = 34) {
@@ -3075,29 +3474,30 @@
                 performanceMode.mobile;
 
 
+            // Phones + reduced-motion → almost no particles
             if (
-                performanceMode.reducedMotion
+                performanceMode.reducedMotion ||
+                mobile
             ) {
 
-                count = 0;
+                // Mobile: max 4 tiny dots, no glow, no stars
+                count = mobile ? 4 : 0;
+
+            } else {
+
+                count = 18;
 
             }
 
-            else {
 
-                count =
-                    mobile
-                        ? 10
-                        : 24;
-
-            }
+            if (count === 0) return;
 
 
             const colors = [
 
-                "rgba(96, 165, 250, 0.9)",
+                "rgba(96, 165, 250, 0.55)",
 
-                "rgba(192, 160, 250, 0.85)"
+                "rgba(192, 160, 250, 0.5)"
 
             ];
 
@@ -3119,15 +3519,20 @@
 
 
                 const size =
-                    Math.random() * 3.5 + 2.5;
+                    mobile
+                        ? Math.random() * 2 + 2
+                        : Math.random() * 3.5 + 2.5;
 
 
                 const left =
                     Math.random() * 100;
 
 
+                // Longer, slower animations = less CPU on phone
                 const duration =
-                    Math.random() * 10 + 9;
+                    mobile
+                        ? Math.random() * 14 + 16
+                        : Math.random() * 10 + 9;
 
 
                 const delay =
@@ -3136,8 +3541,8 @@
 
                 const drift =
                     (
-                        Math.random() * 60 -
-                        30
+                        Math.random() * (mobile ? 30 : 60) -
+                        (mobile ? 15 : 30)
                     ) + "px";
 
 
@@ -3152,14 +3557,15 @@
 
                 const peakOpacity =
                     (
-                        Math.random() * 0.3 +
-                        0.6
+                        Math.random() * 0.2 +
+                        (mobile ? 0.35 : 0.55)
                     ).toFixed(2);
 
 
+                // No stars on mobile (text + shadow is expensive)
                 const isStar =
                     !mobile &&
-                    Math.random() < 0.2;
+                    Math.random() < 0.15;
 
 
                 if (isStar) {
@@ -3173,7 +3579,7 @@
 
 
                     const starSize =
-                        size * 6 + 6;
+                        size * 5 + 5;
 
 
                     particle.style.fontSize =
@@ -3184,7 +3590,7 @@
 
 
                     particle.style.textShadow =
-                        `0 0 6px ${color}`;
+                        `0 0 5px ${color}`;
 
                 }
 
@@ -3200,10 +3606,11 @@
                         color;
 
 
+                    // No box-shadow on mobile (big GPU cost)
                     if (!mobile) {
 
                         particle.style.boxShadow =
-                            `0 0 ${size * 1.6}px ${color}`;
+                            `0 0 ${size * 1.4}px ${color}`;
 
                     }
 
@@ -3232,6 +3639,11 @@
                     "--peak-opacity",
                     peakOpacity
                 );
+
+
+                // Tell the browser these can be composited
+                particle.style.willChange =
+                    "transform, opacity";
 
 
                 container.appendChild(
@@ -3770,10 +4182,15 @@
                 targetRect.height / 2;
 
 
-            const coinCount =
-                performanceMode.mobile
-                    ? 3
-                    : 6;
+            // Skip fancy coin fly on mobile – just pulse the HUD
+            if (performanceMode.mobile) {
+                target.classList.remove("coin-pulse");
+                void target.offsetWidth;
+                target.classList.add("coin-pulse");
+                return;
+            }
+
+            const coinCount = 5;
 
 
             for (
@@ -3881,8 +4298,10 @@
                 return;
 
 
+            // Skip sparkles on mobile / reduced motion (DOM + CSS = lag)
             if (
-                performanceMode.reducedMotion
+                performanceMode.reducedMotion ||
+                performanceMode.mobile
             ) return;
 
 
@@ -3890,10 +4309,7 @@
                 ["✦", "✧", "⭐"];
 
 
-            const count =
-                performanceMode.mobile
-                    ? 4
-                    : 8;
+            const count = 6;
 
 
             for (
@@ -4828,6 +5244,82 @@
            UPDATE UI
         ================================================== */
 
+        /* =================================================
+           PRIVATE DEVELOPER RATING
+           Stored as ratings/{currentUser.uid}.
+           The client never reads the collection back.
+        ================================================== */
+
+        async function submitRating(rating) {
+
+            if (!currentUser || !firebaseReady || !firestoreDB) {
+                showToast("⚠️", "Please log in first.");
+                return;
+            }
+
+            rating = Number(rating);
+
+            if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+                return;
+            }
+
+            const status = document.getElementById("ratingStatus");
+            const buttons = document.querySelectorAll(".rating-star");
+
+            buttons.forEach(button => {
+                button.disabled = true;
+            });
+
+            if (status) {
+                status.textContent = "Saving your rating…";
+            }
+
+            try {
+
+                await firestoreDB
+                    .collection("ratings")
+                    .doc(currentUser.uid)
+                    .set({
+                        rating,
+                        userId: currentUser.uid,
+                        gameId: currentGameId || "",
+                        username: save.username || "",
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, {
+                        merge: true
+                    });
+
+                if (status) {
+                    status.textContent = `Thanks! You rated the game ${rating}/5 ⭐`;
+                }
+
+                showToast("⭐", "Rating saved privately.");
+
+            }
+
+            catch (error) {
+
+                console.error("Rating save failed:", error);
+
+                if (status) {
+                    status.textContent = "Couldn't save the rating. Try again.";
+                }
+
+                showToast("⚠️", "Rating could not be saved.");
+
+            }
+
+            finally {
+
+                buttons.forEach(button => {
+                    button.disabled = false;
+                });
+
+            }
+
+        }
+
+
         function updateUI() {
 
             animateNumber(
@@ -4974,10 +5466,16 @@
             }
 
 
-            const duration =
-                performanceMode.mobile
-                    ? 220
-                    : 350;
+            // Instant update on mobile = zero animation frames
+            if (performanceMode.mobile) {
+                element.textContent =
+                    targetValue.toLocaleString();
+                element.dataset.value =
+                    targetValue;
+                return;
+            }
+
+            const duration = 280;
 
 
             const startTime =
@@ -7962,6 +8460,22 @@
 
         async function cancelDuel() {
 
+            if (
+                activeDuelId ===
+                "BOT_LOCAL"
+            ) {
+
+                clearBotTurn();
+
+                activeBotDuel = null;
+
+                showDuelLobby();
+
+                return;
+
+            }
+
+
             if (!activeDuelId)
                 return;
 
@@ -8953,6 +9467,14 @@
 
         }
 
+
+        // Mark the page so CSS can also go lighter on phones
+        if (performanceMode.mobile) {
+            document.body.classList.add("perf-mobile");
+        }
+        if (performanceMode.reducedMotion) {
+            document.body.classList.add("perf-reduced-motion");
+        }
 
         spawnParticles();
 
